@@ -2,8 +2,11 @@
 #include<iostream>
 #include<algorithm>
 
-//1이면 비숍을 놓을 수 있다. 0이면 비숍은 놓을 수는 없지만 비숍이 지나갈 수 있다.
-//visit이 true면 이미 비숍이 존재하는 것. 
+/* 풀이 : 1이면 비숍을 놓을 수 있다. 0이면 비숍은 놓을 수는 없지만 비숍이 지나갈 수 있다.
+visit이 true면 이미 비숍이 존재하는 것.  맵을 대각선으로 탐색한다. 대각선으로 탐색하다가
+비숍을 놓을 자리가 있으면 다음 열로 건너뛴다. 대각선 하나에는 최대 하나의 비숍만 있을 수 
+있다.*/
+
 using namespace std;
 int map[12][12];
 bool visit[12][12];
@@ -23,7 +26,7 @@ bool check(int i, int j)
 	return 1;
 }
 
-void dfs(int m,int cnt)
+void dfs(int m, int cnt)
 {
 	if (m == 2 * n)
 	{
@@ -33,7 +36,7 @@ void dfs(int m,int cnt)
 		}
 		return;
 	}
-	int check_cnt = 0;
+	bool flag = false;
 	int i;
 	int j;
 	if (cnt > Max)
@@ -45,12 +48,12 @@ void dfs(int m,int cnt)
 		i = 1;
 		j = m;
 	}
-	else//m이 n을 넘으면 탐색 인덱스를 바꿔야한다.
+	else
 	{
 		i = m - n + 1;
 		j = n;
 	}
-	while (i >= 1 && j >= 1 && i <= n && j <= n)
+	while (j >= 1 && i <= n )
 	{
 		if (visit[i][j] == false && map[i][j] == 1)
 		{
@@ -59,19 +62,18 @@ void dfs(int m,int cnt)
 				visit[i][j] = true;
 				dfs(m + 1, cnt + 1);
 				visit[i][j] = false;
-				check_cnt++;
+				flag=true;
 			}
 		}
 		i = i + 1;
 		j = j - 1;
 	}
-	if (check_cnt == 0)
+	if (!flag)
 	{
 		dfs(m + 1, cnt);
 	}
-	
-}
 
+}
 int main()
 {
 	//freopen("Text.txt", "r", stdin);
@@ -86,7 +88,7 @@ int main()
 			cin >> map[i][j];
 		}
 	}
-	dfs(1,0);
+	dfs(1, 0);
 	cout << Max;
 
 	return 0;
