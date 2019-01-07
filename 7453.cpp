@@ -1,7 +1,7 @@
 //https://www.acmicpc.net/problem/7453
 /*풀이 : 완탐으로는 시간이 n^4가 나오므로 시간초과가 뜬다. 우선 a와 가능한 b를 모두
 더하고 c와 가능한 d를 모두 더한다. 그리고 그 더한 것들에 대해 이분탐색을 실행한다.
-둘이 더해서 0이 나오는 것을 lower_bound, upper_bound를 이용해서 찾는다. 약 n^2으로 줄였다*/
+둘이 더해서 0이 나오는 것을 lower_bound, upper_bound를 이용해서 찾는다. 약 n^2log(n)으로 줄였다*/
 #include<iostream>
 #include <algorithm>
 #include <string>
