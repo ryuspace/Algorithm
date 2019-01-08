@@ -23,32 +23,8 @@ bool check()
 	int res5 = (map[1][1] - 'A') + (map[2][2] - 'A') + (map[3][3] - 'A') + (map[4][4] - 'A');
 	int res6 = (map[1][7] - 'A') + (map[2][6] - 'A') + (map[3][5] - 'A') + (map[4][4] - 'A');
 
-	//cout << res1 << "," << res2 << "," << res3 << "," << res4 << "," << res5 << '\n';
-	if (res1 == res2)
-	{
-		if (res2 == res3)
-		{
-			if (res3 == res4)
-			{
-				if (res4 == res5)
-				{
-					if (res5 == res6)
-					{
-						return 1;
-					}
-					else
-						return 0;
-				}
-				else
-					return 0;
-			}
-			else
-				return 0;
-		}
-		else
-			return 0;
-
-	}
+	if ((res1 == res2)&&(res2==res3)&&(res3==res4)&&(res4==res5)&&(res5==res6))
+		return 1;
 	else
 		return 0;
 
