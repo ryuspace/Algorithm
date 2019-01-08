@@ -1,6 +1,6 @@
 //https://www.acmicpc.net/problem/3967
 /*풀이 : 좌표를 넣는 벡터를 하나 만들고 알파벳을 넣는 벡터를 하나 만든다. 그리고 
-x인 곳에 이미 나와있찌 않는 알파벳들의 순열을 집어 넣어 보고 가장 먼저 조건에 맞는
+x인 곳에 이미 나와있지 않는 알파벳들의 순열을 집어 넣어 보고 가장 먼저 조건에 맞는
 순열을 담은 map을 출력한다.*/
 #include<iostream>
 #include <algorithm>
@@ -24,27 +24,34 @@ bool check()
 	int res6 = (map[1][7] - 'A') + (map[2][6] - 'A') + (map[3][5] - 'A') + (map[4][4] - 'A');
 
 	//cout << res1 << "," << res2 << "," << res3 << "," << res4 << "," << res5 << '\n';
-	if (res1 != 26)
+	if (res1 == res2)
 	{
-		return 0;
+		if (res2 == res3)
+		{
+			if (res3 == res4)
+			{
+				if (res4 == res5)
+				{
+					if (res5 == res6)
+					{
+						return 1;
+					}
+					else
+						return 0;
+				}
+				else
+					return 0;
+			}
+			else
+				return 0;
+		}
+		else
+			return 0;
+
 	}
-	if (res2 != 26)
-	{
+	else
 		return 0;
-	}
-	if (res3 != 26)
-	{
-		return 0;
-	}
-	if (res4 != 26)
-	{
-		return 0;
-	}
-	if (res5 != 26)
-	{
-		return 0;
-	}
-		
+
 
 }
 void dfs(int cnt, vector <char> v)
@@ -113,8 +120,6 @@ int main()
 	}
 
 	dfs(0, {});
-
-
 
 	return 0;
 }
