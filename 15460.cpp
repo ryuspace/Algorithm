@@ -1,4 +1,5 @@
 //https://www.acmicpc.net/problem/15460
+/*풀이 : 이전것의 합을 계속 더한 배열과 뒤에서부터 최솟값을 찾은 배열 두 개를 만들어서 가능한 k별로 최댓값을 찾는다 */
 #include <iostream>
 #include <algorithm>
 #include <string>
