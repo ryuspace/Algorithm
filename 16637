@@ -1,0 +1,100 @@
+//https://www.acmicpc.net/problem/16637
+//풀이 : 앞에서 부터 가능한 곳에 모두 괄호를 쳐보고 뒤에서 부터 괄호를 빼보면서
+//가능한 곳에 괄호를 전부 쳐본다.
+
+#include <iostream>
+#include <algorithm>
+#include <vector>
+#include <string>
+
+using namespace std;
+
+int use[20];
+int n;
+string tmp;
+
+long long int maxx = -9999999999;
+void dfs(int cnt)
+{
+	if (cnt >= tmp.length())
+	{
+		long long int summ = 0;
+		for (int j = 0; j < tmp.length(); j = j + 2)
+		{
+			int gwal = 0;
+			int tmpp = tmp[j] - '0';
+			
+			bool flag = false;
+
+			if (j!= tmp.length()-1 && use[j] == 1 && j != 0)
+			{
+
+				int idx = j + 2;
+
+				if (tmp[idx - 1] == '+')
+				{
+					gwal = tmpp + (tmp[idx] - '0');
+				}
+
+				else if (tmp[idx - 1] == '-')
+				{
+					gwal = tmpp - (tmp[idx] - '0');
+				}
+				else if (tmp[idx - 1] == '*')
+				{
+					gwal = tmpp * (tmp[idx] - '0');
+				}
+
+				flag = true;
+				tmpp = gwal;
+			}
+
+			if (j == 0) {
+				
+				summ = tmpp;
+			}
+			else
+			{
+				if (tmp[j - 1] == '+')
+				{
+					summ += tmpp;
+				}
+
+				else if (tmp[j - 1] == '-')
+				{
+					summ -= tmpp;
+				}
+				else if (tmp[j - 1] == '*')
+				{
+					summ *= tmpp;
+				}
+			}
+			if (flag)
+			{
+				j = j + 2;
+			}
+		
+		}
+		maxx = max(summ, maxx);
+	}
+	for (int i = 0; i < tmp.length(); i = i + 2)
+	{
+		if (cnt + i > tmp.length())
+			return;
+		if (use[cnt+i] == 0)
+		{
+			use[cnt+i] = 1;
+			use[cnt + 2+i] = 2;
+			dfs(cnt + 4+i);
+			use[cnt+i] = 0;
+			use[cnt + 2+i] = 0;
+		}
+		
+	}
+}
+
+int main() {
+	cin >> n >> tmp;
+	dfs(0);
+	cout << maxx;
+}
