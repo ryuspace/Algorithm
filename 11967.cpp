@@ -17,10 +17,10 @@ int light[101][101];
 int dx[4] = { -1,1,0,0 };
 int dy[4] = { 0,0,-1,1 };
 queue <pii> q;
+
 int cnt = 0;
 void bfs(pii start)
 {
-	memset(visit, 0, sizeof(visit));
 	visit[start.first][start.second] = 1;
 	for (int i = 0; i < v[start.first][start.second].size(); i++)
 	{
@@ -31,10 +31,9 @@ void bfs(pii start)
 		int nx = start.first + dx[i];
 		int ny = start.second + dy[i];
 		if (nx >= 0 && nx < n && ny >= 0 && ny < n&&
-			visit[nx][ny]==false && light[nx][ny]==1)
+			visit[nx][ny] == false && light[nx][ny] == 1)
 		{
 			bfs({ nx,ny });
-
 		}
 	}
 }
@@ -54,7 +53,11 @@ int main()
 	visit[0][0] = true;
 	light[0][0] = 1;
 
-	bfs({ 0,0 });
+	for (int i = 0; i < n*n; i++)
+	{
+		memset(visit, 0, sizeof(visit));
+		bfs({ 0,0 });
+	}
 	for (int i = 0; i < n; i++)
 	{
 		for (int j = 0; j < n; j++)
@@ -67,4 +70,3 @@ int main()
 
 	return 0;
 }
-
