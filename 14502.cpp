@@ -1,4 +1,4 @@
-//https://www.acmicpc.net/problem/14889
+//https://www.acmicpc.net/problem/14502
 /*풀이 : dfs를 이용하여 맵에 빈 공간에 벽을 세울 수 있는 모든 경우를 탐색해보고 벽을 3개 세웠으면 bfs를 이용해 안전영역을 찾는다.*/
 #include <iostream>
 #include <algorithm>
