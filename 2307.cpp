@@ -16,7 +16,7 @@ priority_queue< pair<int, int>, vector<pair<int, int> >, greater<pair<int, int> 
 
 int price[20001];
 
-int dikstra(int u,int v)
+int dikstra(int u,int v) //u에서 v로 가는 방법을 막는다.
 {
 	for (int i = 1; i <= V; i++)
 	{
