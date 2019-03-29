@@ -1,5 +1,6 @@
 //https://www.acmicpc.net/problem/14888
-/*풀이 : dfs를 이용하여 모든 가능한 연산자 순열을 만들어 전부 계산해 본다.*/
+/*풀이 : dfs를 이용하여 모든 가능한 연산자 순열을 만들어 전부 계산해 본다.
+(n-1)*(n-2)*(n-3)*....1 번의 함수가 호출되므로 시간복잡도는 대략 n! .... (?!)*/
 #include <iostream>
 #include <algorithm>
 #include <vector>
