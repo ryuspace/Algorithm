@@ -4,50 +4,51 @@ bfs를 이용하고 파란 구슬이 구멍에 떨어지는 경우에는
 큐에 push 해주지 않는다.*/
 #include <iostream>
 #include <algorithm>
-#include <vector>
+#include <string>
 #include <queue>
-#include <cstring>
 #include <cmath>
 using namespace std;
-
 typedef pair<int, int> pii;
-typedef pair <pii, pii> pp;
 int n, m;
 char arr[11][11];
+pii red;
+pii blue;
 int dx[4] = { -1,1,0,0 };
 int dy[4] = { 0,0,-1,1 };
-bool visit[11][11][11][11];//빨간 공의 위치와 파란 공의 위치를 담는 배열
-vector<pii> red;
-vector<pii> blue;
-int bfs()
+bool visit[11][11][11][11];
+
+struct point {
+	int rx, ry, bx, by;
+};
+void bfs()
 {
-	int cntt = 0;
-	queue< pp> q;
-	q.push({ { red[0].first,red[0].second },{ blue[0].first,blue[0].second } });
-	visit[red[0].first][red[0].second][blue[0].first][blue[0].second] = true;
+	int cnt = 0;
+	queue<point> q;
+	visit[red.first][red.second][blue.first][blue.second] = true;
+	q.push({ red.first,red.second,blue.first,blue.second });
 	while (!q.empty())
 	{
 		int sizz = q.size();
 		while (sizz--)
 		{
-			pp front = q.front();
+			point front = q.front();
 			q.pop();
-			int rx = front.first.first;
-			int ry = front.first.second;
-			int bx = front.second.first;
-			int by = front.second.second;
-			if (cntt > 10)
-				return -1;
-			if (arr[rx][ry] == 'O')
-				return cntt;
-
+			if (arr[front.rx][front.ry] == 'O')
+			{
+				if (cnt <= 10)
+					cout << cnt;
+				else
+					cout << -1;
+				exit(0);
+			}
+	
 			for (int i = 0; i < 4; i++)
 			{
-				int rxx = rx + dx[i];
-				int ryy = ry + dy[i];
-				int bxx = bx + dx[i];
-				int byy = by + dy[i];
-				while (arr[rxx][ryy] != '#' &&arr[rxx][ryy] != 'O')
+				int rxx = front.rx;
+				int ryy = front.ry;
+				int bxx = front.bx;
+				int byy = front.by;
+				while (arr[rxx][ryy] == '.')
 				{
 					rxx += dx[i];
 					ryy += dy[i];
@@ -57,7 +58,7 @@ int bfs()
 					rxx -= dx[i];
 					ryy -= dy[i];
 				}
-				while (arr[bxx][byy] != '#' &&arr[bxx][byy] != 'O')
+				while (arr[bxx][byy] == '.')
 				{
 					bxx += dx[i];
 					byy += dy[i];
@@ -66,54 +67,72 @@ int bfs()
 				{
 					bxx -= dx[i];
 					byy -= dy[i];
-				}
-
-				if (arr[bxx][byy] == 'O')
-					continue;
-				if (rxx == bxx && ryy == byy)
+				}				
+				//큐에 다시 넣어야하는 조건 1. 둘 다 .인경우 2. 빨강만 O에 들어간 경우
+				if (rxx == bxx && ryy == byy && arr[rxx][ryy] != 'O')
 				{
-					if (arr[rxx][ryy] != 'O')
+					if (abs(rxx - front.rx) + abs(ryy - front.ry) > abs(bxx - front.bx) +
+						abs(byy - front.by))
 					{
-						int red_dist = abs(rx - rxx) + abs(ry - ryy);
-						int blue_dist = abs(bx - bxx) + abs(by - byy);
-						if (red_dist < blue_dist)
-						{
-							bxx -= dx[i];
-							byy -= dy[i];
-						}
-						else
-						{
-							rxx -= dx[i];
-							ryy -= dy[i];
-						}
+						rxx -= dx[i];
+						ryy -= dy[i];
 					}
+					else
+					{
+						bxx -= dx[i];
+						byy -= dy[i];
+					}
+					if (visit[rxx][ryy][bxx][byy])
+						continue;
+					visit[rxx][ryy][bxx][byy] = true;
+					q.push({ rxx,ryy,bxx,byy });
 				}
-				if (visit[rxx][ryy][bxx][byy] == 0)//이 위치에 이미 왔었으면 횟수 낭비
+				else if (arr[rxx][ryy] == 'O' && arr[bxx][byy] != 'O')
 				{
-					visit[rxx][ryy][bxx][byy] = 1;
-					q.push({ { rxx,ryy },{ bxx,byy } });
+					if (visit[rxx][ryy][bxx][byy])
+						continue;
+					visit[rxx][ryy][bxx][byy] = true;
+					q.push({ rxx,ryy,bxx,byy });
+				}
+				else if(arr[rxx][ryy]=='.' && arr[bxx][byy]=='.')
+				{
+					if (visit[rxx][ryy][bxx][byy])
+						continue;
+					visit[rxx][ryy][bxx][byy] = true;
+					q.push({ rxx,ryy,bxx,byy });
 				}
 			}
 		}
-		cntt++;
+		cnt++;
 	}
-	return -1;
 }
-
 int main()
 {
 	ios_base::sync_with_stdio(0);
 	cin >> n >> m;
 	for (int i = 0; i < n; i++)
+	{
+		string tmp;
+		cin >> tmp;
 		for (int j = 0; j < m; j++)
 		{
-			cin >> arr[i][j];
-			if (arr[i][j] == 'R')
-				red.push_back({ i,j });
+			arr[i][j] = tmp[j];
 			if (arr[i][j] == 'B')
-				blue.push_back({ i,j });
+			{
+				blue = { i,j };
+				arr[i][j] = '.';
+			}
+			else if (arr[i][j] == 'R')
+			{
+				red = { i,j };
+				arr[i][j] = '.';
+			}
 		}
-	cout << bfs();
+	}
+
+	bfs();
+	cout << -1;
 	return 0;
+}
 }
 
