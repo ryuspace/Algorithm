@@ -9,9 +9,9 @@
 using namespace std;
 
 int n;
-bool use[20];
-int su[20];
-int bu[20];
+bool use[22];
+int su[22];
+int bu[22];
 string tmp;
 
 long long int cal(long long int a, char b, long long int c)
@@ -38,7 +38,9 @@ void dfs(bool flag,long long int one,char buho,long long int two,int now)
 	}
 	else
 	{
-		dfs(0, one, buho, cal(two, bu[now + 1], su[now + 2]), now + 2);
+		long long int hi = cal(one, buho, cal(two, bu[now + 1], su[now + 2]));
+		dfs(0, hi, bu[now+3], su[now + 4], now + 4);
+		dfs(1, hi, bu[now + 3], su[now + 4], now + 4);
 	}
 }
 int main()
@@ -53,6 +55,11 @@ int main()
 		else
 			bu[i] = tmp[i];
 	}
+	//괄호가 있다고 가정하면 4씩 넘어가니까.. n-1을 넘어갈 경우의 연산해도 의미 없는 숫자를 미리 넣어준다.
+	bu[n] = '+';
+	su[n + 1] = 0;
+
+
 	dfs(0, 0, '+', su[0], 0);
 	dfs(1, 0, '+', su[0], 0);
 	cout << res;
