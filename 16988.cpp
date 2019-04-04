@@ -1,7 +1,10 @@
 //https://www.acmicpc.net/problem/16988
 /*풀이 :0인 칸 2개를 선택할 수 있는 가능한 모든 경우를 찾고
 각각의 경우에 bfs를 돌려서 잡을 수 있는 
-상대방의 돌의 개수의 최대값을 찾는다.*/
+상대방의 돌의 개수의 최대값을 찾는다.
+시간 복잡도 : 돌을 2개를 놓는 경우 : (N^2*M^2)
+bfs 돌리는 경우 N*M
+총 N^3*M^3*/
 #include <iostream>
 #include <algorithm>
 #include <queue>
