@@ -5,119 +5,136 @@
 뺀 것과 같다.*/
 #include <iostream>
 #include <algorithm>
-#include <queue>
 #include <vector>
-
 using namespace std;
-
-typedef pair<int, int> pii;
-vector <int> v[101][101];
-int arr[101][101];//추가되는 양분을 받음
-int tree[101][101];
-int dx[8] = { -1,-1,-1,0,0,1,1,1 };
-int dy[8] = { -1,0,1,-1,1,-1,0,1 };
 int n, m, k;
-void hi()
+int yang[11][11];
+int yang2[11][11];
+vector<int> arr[11][11];
+int dx[8] = { -1,1,0,0,-1,-1,1,1 };
+int dy[8] = { 0,0,-1,1,-1,1,-1,1 };
+void ss()
 {
+	
 	for (int i = 0; i < n; i++)
 	{
 		for (int j = 0; j < n; j++)
 		{
-			sort(v[i][j].begin(), v[i][j].end());
-		}
-	}
-	for (int i = 0; i < n; i++)
-	{
-		for (int j = 0; j < n; j++)
-		{
-			int sum = 0;
-			int cnt = 0;
-			for (int k = 0; k < v[i][j].size(); k++)
+			int die_yang = 0;
+			int idx = 0;
+			for (int r = 0; r < arr[i][j].size(); r++)
 			{
-				if (v[i][j][k] <= tree[i][j])
+				if (arr[i][j][r] <= yang[i][j])
 				{
-					tree[i][j] -= v[i][j][k];//나이만큼 양분 감소
-					v[i][j][k]++;
+					yang[i][j] -= arr[i][j][r];
+					arr[i][j][r]++;
 				}
 				else
 				{
-					sum += v[i][j][k] / 2;
-					cnt++;
+					idx++;
+					break;
 				}
-				
 			}
-			while (cnt--)
+			if (idx != 1e9)
 			{
-				v[i][j].pop_back();
+				for (int r = arr[i][j].size() - 1; r >= idx; r--)
+				{
+					die_yang += (arr[i][j][r] / 2);
+				}
+				for (int r = arr[i][j].size() - 1; r >= idx; r--)
+				{
+					arr[i][j].pop_back();
+				}
 			}
-			tree[i][j] += sum;
+			yang[i][j] += die_yang;
 		}
 	}
 }
-void bye()
+void aw()
 {
 	for (int i = 0; i < n; i++)
 	{
 		for (int j = 0; j < n; j++)
 		{
-			for (int k = 0; k < v[i][j].size(); k++)
+			int nai = 0;
+			for (int r = 0; r < arr[i][j].size(); r++)
 			{
-				if (v[i][j][k] % 5 == 0)
+				if (arr[i][j][r] % 5 == 0)
+					nai++;
+			}
+			for (int r = 0; r < 8; r++)
+			{
+				int nx = i + dx[r];
+				int ny = j + dy[r];
+				if (nx >= 0 && nx < n && ny >= 0 && ny < n)
 				{
-					for (int r = 0; r < 8; r++)
+					for (int k = 0; k < nai; k++)
 					{
-						int nx = i + dx[r];
-						int ny = j + dy[r];
-
-						if (nx >= 0 && nx < n && ny >= 0 && ny < n)
-						{
-							v[nx][ny].push_back(1);
-						}
+						arr[nx][ny].push_back(1);
 					}
 				}
 			}
 		}
 	}
-
 	for (int i = 0; i < n; i++)
 	{
 		for (int j = 0; j < n; j++)
 		{
-			tree[i][j] += arr[i][j];
+			yang[i][j] += yang2[i][j];
 		}
 	}
+
 
 }
 int main()
 {
+	ios_base::sync_with_stdio(0);
 	cin >> n >> m >> k;
 	for (int i = 0; i < n; i++)
 	{
 		for (int j = 0; j < n; j++)
 		{
-			cin >> arr[i][j];
-			tree[i][j] = 5;
+			yang[i][j] = 5;
+			cin >> yang2[i][j];
 		}
 	}
-	int x, y, z;
-	
 	for (int i = 0; i < m; i++)
 	{
+		int x, y, z;
 		cin >> x >> y >> z;
-		v[x - 1][y - 1].push_back(z);
+		arr[x-1][y-1].push_back(z);
 	}
-
+	for (int i = 0; i < n; i++)
+	{
+		for (int j = 0; j < n; j++)
+		{
+			if (!arr[i][j].empty())
+			{
+				sort(arr[i][j].begin(), arr[i][j].end());
+			}
+		}
+	}
 	while (k--)
 	{
-		hi();
-		bye();
+		ss();
+		aw();
+		for (int i = 0; i < n; i++)
+		{
+			for (int j = 0; j < n; j++)
+			{
+				if (!arr[i][j].empty())
+				{
+					sort(arr[i][j].begin(), arr[i][j].end());
+				}
+			}
+		}
 	}
 	int cnt = 0;
 	for (int i = 0; i < n; i++)
 	{
 		for (int j = 0; j < n; j++)
 		{
-			cnt += v[i][j].size();
+			cnt += arr[i][j].size();
 		}
 	}
 	cout << cnt;
