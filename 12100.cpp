@@ -1,211 +1,224 @@
 //https://www.acmicpc.net/problem/12100
-/*풀이 : 카피 배열은 카피 할 때 마다 새로 만들자.
-한번의 시행은 상,하,좌,우 중 하나로 움직이는 거다.
-맵에서 0이 아닌 숫자를 큐에 담고 첫번째 인덱스 부터
-숫자들을 조건에 맞게(같은 숫자면 *2,다른 숫자면 다음에 놓는다,0이면 그 자리에 놓는다.)
-놓아준다.*/
+/*풀이 : 처음 숫자를 벡터에 넣어주고, 다음 숫자가 벡터에 있는 숫자와 같고 합쳐진 적이 없으면 합친다.
+벡터에 있는 숫자와 다르거나 합쳐진 적이 있으면 그냥 벡터에 push 한다.
+검사한 행 또는 열은 전부 0으로 초기화 해주고 방향에 맞게 벡터의 원소를 나열해준다.*/
 #include <iostream>
 #include <algorithm>
 #include <string>
-#include <queue>
-
+#include <vector>
 using namespace std;
-int arr[21][21];
-
+typedef pair<int, int> pii;
+int t;
+int map[21][21];
 int n;
-
-void fun(int num)
+void fun(int dir)
 {
-	if (num == 0)//상
+	if (dir == 0)
 	{
-		for (int j = 0; j < n; j++)
+		for (int i = 0; i < n; i++)
 		{
-			queue <int> q;
-			for (int i = 0; i < n; i++)
-			{
-				if (arr[i][j] != 0)
-				{
-					q.push(arr[i][j]);
-				}
-				arr[i][j] = 0;
-			}
 			int idx = 0;
-			while (!q.empty())
+			vector<pii> v;
+			while (idx< n && map[i][idx] == 0)
 			{
-				int front = q.front();
-				q.pop();
-				if (arr[idx][j] == 0)
+				idx++;
+			}
+			if (idx < n)
+			{
+				v.push_back({ map[i][idx],0 });
+				map[i][idx] = 0;
+				for (int j = idx + 1; j < n; j++)
 				{
-					arr[idx][j] = front;
+					if (map[i][j] != 0 && map[i][j] == v.back().first &&
+						v.back().second == 0)
+					{
+						v.pop_back();
+						v.push_back({ map[i][j] * 2,1 });
+						map[i][j] = 0;
+					}
+
+					else if (map[i][j] != 0 && map[i][j] == v.back().first &&
+						v.back().second == 1 || map[i][j] != 0 && map[i][j] != v.back().first)
+					{
+						v.push_back({ map[i][j],0 });
+						map[i][j] = 0;
+					}
 				}
-				else
+				for (int j = 0; j < v.size(); j++)
 				{
-					if (arr[idx][j] == front)
+					map[i][j] = v[j].first;
+				}
+
+			}
+
+		}
+	}
+	else if (dir == 1)
+	{
+		for (int i = n - 1; i >= 0; i--)
+		{
+			int idx = n - 1;
+			vector<pii> v;
+			while (idx >= 0 && map[i][idx] == 0)
+			{
+				idx--;
+			}
+			if (idx >= 0)
+			{
+				v.push_back({ map[i][idx],0 });
+				map[i][idx] = 0;
+				for (int j = idx - 1; j >= 0; j--)
+				{
+					if (map[i][j] != 0 && map[i][j] == v.back().first &&
+						v.back().second == 0)
 					{
-						arr[idx][j] = arr[idx][j] * 2;
-						idx++;
+						v.pop_back();
+						v.push_back({ map[i][j] * 2,1 });
+						map[i][j] = 0;
 					}
-					else
+					else if (map[i][j] != 0 && map[i][j] == v.back().first &&
+						v.back().second == 1 || map[i][j] != 0 && map[i][j] != v.back().first)
 					{
-						idx++;
-						arr[idx][j] = front;
+						v.push_back({ map[i][j],0 });
+						map[i][j] = 0;
 					}
+				}
+				for (int j = 0; j < v.size(); j++)
+				{
+					map[i][n - 1 - j] = v[j].first;
 				}
 			}
 		}
 	}
-	else if (num == 1)//하
+	else if (dir == 2)
 	{
-		for (int j = 0; j < n; j++)
+		for (int i = n - 1; i >= 0; i--)
 		{
-			queue <int> q;
-			for (int i = n-1; i>=0; i--)
+			int idx = n - 1;
+			vector<pii> v;
+			while (idx >= 0 && map[idx][i] == 0)
 			{
-				if (arr[i][j] != 0)
-				{
-					q.push(arr[i][j]);
-				}
-				arr[i][j] = 0;
+				idx--;
 			}
-			int idx = n-1;
-			while (!q.empty())
+			if (idx >= 0)
 			{
-				int front = q.front();
-				q.pop();
-				if (arr[idx][j] == 0)
+				v.push_back({ map[idx][i],0 });
+				map[idx][i] = 0;
+				for (int j = idx - 1; j >= 0; j--)
 				{
-					arr[idx][j] = front;
-				}
-				else
-				{
-					if (arr[idx][j] == front)
+					if (map[j][i] != 0 && map[j][i] == v.back().first &&
+						v.back().second == 0)
 					{
-						arr[idx][j] = arr[idx][j] * 2;
-						idx--;
+						v.pop_back();
+						v.push_back({ map[j][i] * 2,1 });
+						map[j][i] = 0;
 					}
-					else
+					else if (map[j][i] != 0 && map[j][i] == v.back().first &&
+						v.back().second == 1 || map[j][i] != 0 && map[j][i] != v.back().first)
 					{
-						idx--;
-						arr[idx][j] = front;
+						v.push_back({ map[j][i],0 });
+						map[j][i] = 0;
 					}
 				}
+				for (int j = 0; j < v.size(); j++)
+				{
+					map[n - 1 - j][i] = v[j].first;
+				}
+
 			}
+
 		}
 	}
-	else if (num == 2)//좌
+	else if (dir == 3)
 	{
-		for (int j = 0; j < n; j++)
+		for (int i = 0; i < n; i++)
 		{
-			queue <int> q;
-			for (int i = 0; i < n; i++)
-			{
-				if (arr[j][i] != 0)
-				{
-					q.push(arr[j][i]);
-				}
-				arr[j][i] = 0;
-			}
 			int idx = 0;
-			while (!q.empty())
+			vector<pii> v;
+			while (idx< n && map[idx][i] == 0)
 			{
-				int front = q.front();
-				q.pop();
-				if (arr[j][idx] == 0)
-				{
-					arr[j][idx] = front;
-				}
-				else
-				{
-					if (arr[j][idx] == front)
-					{
-						arr[j][idx] = arr[j][idx] * 2;
-						idx++;
-					}
-					else
-					{
-						idx++;
-						arr[j][idx] = front;
-					}
-				}
+				idx++;
 			}
-		}
-	}
-	else if (num == 3)//우
-	{
-		for (int j = 0; j < n; j++)
-		{
-			queue <int> q;
-			for (int i = n-1; i >=0; i--)
+			if (idx < n)
 			{
-				if (arr[j][i] != 0)
+				v.push_back({ map[idx][i],0 });
+				map[idx][i] = 0;
+				for (int j = idx + 1; j < n; j++)
 				{
-					q.push(arr[j][i]);
-				}
-				arr[j][i] = 0;
-			}
-			int idx = n-1;
-			while (!q.empty())
-			{
-				int front = q.front();
-				q.pop();
-				if (arr[j][idx] == 0)
-				{
-					arr[j][idx] = front;
-				}
-				else
-				{
-					if (arr[j][idx] == front)
+					if (map[j][i] != 0 && map[j][i] == v.back().first &&
+						v.back().second == 0)
 					{
-						arr[j][idx] = arr[j][idx] * 2;
-						idx--;
+						v.pop_back();
+						v.push_back({ map[j][i] * 2,1 });
+						map[j][i] = 0;
 					}
-					else
+					else if (map[j][i] != 0 && map[j][i] == v.back().first &&
+						v.back().second == 1 || map[j][i] != 0 && map[j][i] != v.back().first)
 					{
-						idx--;
-						arr[j][idx] = front;
+						v.push_back({ map[j][i],0 });
+						map[j][i] = 0;
 					}
 				}
+				for (int j = 0; j < v.size(); j++)
+				{
+					map[j][i] = v[j].first;
+				}
+
 			}
+
 		}
 	}
 }
-int maxx = 0;
+int res = 0;
 void dfs(int cnt)
 {
-	if (cnt == 6)
+	int tmp[21][21];
+	for (int i = 0; i < n; i++)
+	{
+		for (int j = 0; j < n; j++)
+		{
+			tmp[i][j] = map[i][j];
+		}
+	}
+	int maxx = 0;
+	for (int i = 0; i < n; i++)
+	{
+		for (int j = 0; j < n; j++)
+		{
+			maxx = max(maxx, map[i][j]);
+		}
+	}
+	res = max(res, maxx);
+	if (cnt == 5)
 	{
 		return;
 	}
-	for (int k = 0; k < n; k++)
-		for (int j = 0; j < n; j++)
-		{
-			maxx = max(arr[k][j], maxx);
-		}
-	int cop[21][21];
-	for (int k = 0; k < n; k++)
-		for (int j = 0; j < n; j++)
-			cop[k][j] = arr[k][j];
-	for (int i = 0; i < 4; i++)//상하좌우
+	for (int i = 0; i < 4; i++)
 	{
 		fun(i);
 		dfs(cnt + 1);
-		for (int k = 0; k < n; k++)
+		for (int r = 0; r < n; r++)
+		{
 			for (int j = 0; j < n; j++)
-				arr[k][j] = cop[k][j];
-		
+			{
+				map[r][j] = tmp[r][j];
+			}
+		}
 	}
 }
-
 int main()
 {
 	ios_base::sync_with_stdio(0);
 	cin >> n;
 	for (int i = 0; i < n; i++)
+	{
 		for (int j = 0; j < n; j++)
-			cin >> arr[i][j];
-
+		{
+			cin >> map[i][j];
+		}
+	}
 	dfs(0);
-	cout << maxx;
+	cout << res;
 	return 0;
 }
 
