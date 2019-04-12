@@ -1,6 +1,7 @@
 /*2383번 점심 식사시간
 풀이 : dfs로 모든 가능한 사람들이 계단을 고르는 경우의 수를 구하고
 구현한다.
+num 배열에 각자 고른 계단의 도착시간을 넣어준다.
 계단을 내려가고 있는 사람의 도착시간을 miq라고 하고
 기다리고 있는 사람을 q라고 하면
 miq는 도착 시간이 되면 pop해주고
@@ -42,8 +43,6 @@ void play()
 	queue<int> q[2];
 	queue<int> miq[2];
 	int cntt = 0;
-	int mae[2] = { 0,0 };
-	bool wait[2] = { false,false};
 	int maxx = 0;
 	for (int ti = 1;; ti++)
 	{
@@ -115,6 +114,7 @@ int main()
 	{
 		st.clear();
 		pp.clear();
+		memset(jemul, 0, sizeof(jemul));
 		res = 1e9;
 		cin >> n;
 		for (int i = 0; i < n; i++)
