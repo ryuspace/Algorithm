@@ -27,6 +27,17 @@ int main()
 			s.pop();
 			int wi = i - s.top()-1;
 			maxx = max(maxx, hi * wi);
+			/*
+			int hi = arr[s.top()];
+			int wi = i - s.top();
+			s.pop();
+			maxx = max(maxx, hi * wi);
+			이 안되는 이유는
+			1 4 2 4 4 4 1 히스토그램 한번 생각해보기..
+			내가 pop되었다는 것은 나보다 앞에있던 모든 나보다 긴 놈은 이미 빠져있는 상태야! 
+			그러므로 나보다 앞에 살아있는 놈 기준으로 봐야해.. 나와 내 앞 살아있는 놈 사이에
+			얼마나 죽었는지 모르니까..!
+			*/
 		}
 		s.push(i);
 	}
