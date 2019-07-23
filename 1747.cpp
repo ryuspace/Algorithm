@@ -10,7 +10,7 @@ using namespace std;
 bool visit[1004001];
 bool check(string tmp)
 {
-	for (int i = 0; i < ceil(tmp.length() / 2); i++)
+	for (int i = 0; i < tmp.length()+1 / 2; i++)
 	{
 		if (tmp[i] != tmp[tmp.length() - 1 - i])
 			return false;
@@ -25,9 +25,9 @@ int main()
 	visit[1] = true;
 	int n;
 	cin >> n;
-	for (int i = 2; i <= 110; i++)
+	for (int i = 2; i <= 103; i++)
 	{
-		for (int j = n; j <= 1004000; j++)
+		for (int j = i*i; j <= 1004000; j+=i)
 		{
 			if (!visit[j] && j % i == 0 && j != i)
 			{
