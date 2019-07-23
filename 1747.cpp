@@ -1,5 +1,5 @@
 //https://www.acmicpc.net/problem/1747
-/*풀이 : 에라토스테네스의 체로 시간복잡도를 O(log(n)*n)으로 줄였따.. 하지만 더 줄일 수 있는 방법이
+/*풀이 : 에라토스테네스의 체로 시간복잡도를 O(root(n))*n)으로 줄였따.. 하지만 더 줄일 수 있는 방법이
 있다... 더 공부하자.. */
 #include <iostream>
 #include <algorithm>
