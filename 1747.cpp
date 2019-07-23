@@ -10,7 +10,7 @@ using namespace std;
 bool visit[1004001];
 bool check(string tmp)
 {
-	for (int i = 0; i < tmp.length()+1 / 2; i++)
+	for (int i = 0; i < tmp.length() + 1 / 2; i++)
 	{
 		if (tmp[i] != tmp[tmp.length() - 1 - i])
 			return false;
@@ -25,18 +25,19 @@ int main()
 	visit[1] = true;
 	int n;
 	cin >> n;
-	for (int i = 2; i <= 103; i++)
+
+	for (int i = 2; i*i < 1003100; i++)
 	{
-		for (int j = i*i; j <= 1004000; j+=i)
+		if (!visit[i])
 		{
-			if (!visit[j] && j % i == 0 && j != i)
+			for (int j = i * i; j < 1003100; j += i)//i가 소수면 i*i부터의 i의 배수들은 미리 전부 지워주자 나중에 시간을 절약하기 위해서!
 			{
 				visit[j] = true;
 			}
-
 		}
+
 	}
-	for (int j = n; j < 1004000; j++)
+	for (int j = n; j < 1003100; j++)
 	{
 		if (!visit[j])
 		{
