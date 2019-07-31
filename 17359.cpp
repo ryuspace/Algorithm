@@ -5,13 +5,14 @@
 #include <iostream>
 #include <algorithm>
 #include <string>
-
+#include <vector>
 using namespace std;
 
 string bulb[11];
 int n,base = 0;
 int jemul[11];
 int minn = 1e9;
+vector<string> v;
 int main()
 {
 	//freopen("Text.txt", "r", stdin);
@@ -23,7 +24,11 @@ int main()
 		cin >> bulb[i];
 	for (int i = 0; i < n; i++)
 	{
+		string tmp = "";
 		char start = bulb[i][0];
+		tmp += bulb[i][0];
+		if(bulb[i].length()==1)
+			tmp += bulb[i][0];
 		for (int j = 1; j < bulb[i].length(); j++)
 		{
 			if (bulb[i][j] != start)
@@ -31,7 +36,10 @@ int main()
 				base++;
 				start = bulb[i][j];
 			}
+			if(j== bulb[i].length()-1)
+				tmp += bulb[i][bulb[i].length() - 1];
 		}
+		v.push_back(tmp);
 		jemul[i] = i;
 	}
 	do
@@ -39,8 +47,7 @@ int main()
 		int cnt = 0;
 		for (int i = 0; i < n - 1; i++)
 		{
-			if (bulb[jemul[i]][bulb[jemul[i]].length() - 1] !=
-				bulb[jemul[i + 1]][0])
+			if (v[jemul[i]][1]!=v[jemul[i+1]][0])
 			{
 				cnt++;
 			}
