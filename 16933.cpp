@@ -1,5 +1,6 @@
 //https://www.acmicpc.net/problem/16933
-/*풀이 : 벽을 n개 만큼 깨고 온 적이 없으면 큐에 추가해주는게 포인트.*/
+/*풀이 : 벽을 n개 만큼 깨고 온 적이 없으면 큐에 추가해주는게 포인트. n개를 깨고 온 적이 없다면
+가장 먼저 그 배열에 도달한 info가 우선 최단경로로 오는 후보.. 그 이후에 오는 애들은 생각할 필요도 없다. 어차피 늦는다.*/
 #include <iostream>
 #include <algorithm>
 #include <string>
