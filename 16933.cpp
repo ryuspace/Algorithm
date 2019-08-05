@@ -1,7 +1,5 @@
 //https://www.acmicpc.net/problem/16933
-/*풀이 : bfs + 다익스트라.. 현재 온 위치가 가장 짧은 경로로 온 거라면
-큐에 넣어준다. 짧은 경로는 같은 개수의 벽을 부수고 왔는데 그것이
-최단 경로이다.*/
+/*풀이 : 벽을 n개 만큼 깨고 온 적이 없으면 큐에 추가해주는게 포인트.*/
 #include <iostream>
 #include <algorithm>
 #include <string>
@@ -14,68 +12,64 @@ typedef pair<int, int> pii;
 
 int n, m, k;
 int arr[1001][1001];
-int visit[1001][1001][11];
+bool visit[1001][1001][11];
 int dx[4] = { -1,1,0,0 };
 int dy[4] = { 0,0,-1,1 };
 
 struct info
 {
-	int x, y, z,d;//z는 부순적이 있는지 체크 d는 낮,밤
+	int x, y, z;
 };
 int bfs()
 {
-	for (int i = 0; i <= 1000; i++)
-	{
-		for (int j = 0; j <= 1000; j++)
-		{
-			for (int r = 0; r <= 10; r++)
-			{
-				visit[i][j][r] = 1e9;
-			}
-		}
-	}
-	int cnt = 1;
+	int cnt = 0;//낮인지 밤인지 나타낼 수 있고 며칠이 지났는지..
 	queue <info> q;
-	q.push({ 0,0,0,0 });
+	q.push({ 0,0,0 });
 	while (!q.empty())
 	{
-		info front = q.front();
-		q.pop();
-		if (front.x == n - 1 && front.y == m - 1)
-			return front.d+1;
-		for (int i = 0; i < 4; i++)
+		int sizz = q.size();
+		while (sizz--)
 		{
-			int nx = dx[i] + front.x;
-			int ny = dy[i] + front.y;
-			if (nx >= 0 && nx < n && ny >= 0 && ny < m)
+			info front = q.front();
+			q.pop();
+			if (front.x == n - 1 && front.y == m - 1)
+				return cnt + 1;
+			for (int i = 0; i < 4; i++)
 			{
-				if (arr[nx][ny] == 0)
+				int nx = dx[i] + front.x;
+				int ny = dy[i] + front.y;
+				if (nx >= 0 && nx < n && ny >= 0 && ny < m)
 				{
-					if (1 + front.d < visit[nx][ny][front.z])
+					if (arr[nx][ny] == 0)
 					{
-						visit[nx][ny][front.z] = front.d + 1;
-						q.push({ nx,ny,front.z,front.d + 1 });
-					}
+						if (!visit[nx][ny][front.z])
+						{
+							visit[nx][ny][front.z] = true;
+							q.push({ nx,ny,front.z });
+						}
 
-				}
-				if (arr[nx][ny] == 1 && front.z<k)
-				{
-					if (1 + front.d < visit[nx][ny][front.z + 1])
+					}
+					if (arr[nx][ny] == 1 && front.z < k)
 					{
-						if (front.d % 2 == 1)
+						if (!visit[nx][ny][front.z + 1])//벽을 깰 예정 front.z+1개를 깨고 온 적이 없다면 큐에 추가해주자.
 						{
-							q.push({ front.x,front.y,front.z,front.d+1 });
+							if (cnt % 2 == 1)
+							{
+								q.push({ front.x,front.y,front.z });
+							}
+							else
+							{
+								q.push({ nx,ny,front.z + 1 });
+								visit[nx][ny][front.z + 1] = true;
+							}
 						}
-						else
-						{
-							q.push({ nx,ny,front.z + 1,front.d + 1 });
-							visit[nx][ny][front.z + 1] = front.d+1;
-						}
-					}
 
+					}
 				}
 			}
 		}
+		cnt++;
+		
 	}
 	return -1;
 }
