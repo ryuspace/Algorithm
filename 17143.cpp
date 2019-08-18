@@ -1,6 +1,11 @@
 //https://www.acmicpc.net/problem/17143
 /*풀이 : 그냥 시뮬레이션.. 크게 어려운 건 없었다. 구조체 배열을 만들어서 속력,이동방향,크기를
-조절했다.*/
+조절했다.
+ps : 속도 하나하나를 움직이는걸 시뮬레이션을 했더니 재채점 결과 TLE가 떴다. 
+방향에 이동속도를 곱하는 방식으로 시뮬레이션을 바꿨다.
+범위를 넘어가면 방향을 반대로 해준다.
+
+*/
 #include <iostream>
 #include <algorithm>
 
@@ -17,35 +22,36 @@ int dy[4] = { 0,1,0,-1 };
 void mov()
 {
 	point cop[101][101] = { 0, };
-	for (int i = 1; i <= R; i++)
+	for (int i = 0; i < R; i++)
 	{
-		for (int j = 1; j <= C; j++)
+		for (int j = 0; j < C; j++)
 		{
 			if (arr[i][j].z != 0)
 			{
+				int ss = arr[i][j].s;
 				int x = i;
 				int y = j;
-				int dir_x = dx[arr[i][j].d];
-				int dir_y = dy[arr[i][j].d];
-				for (int m = 1; m <= arr[i][j].s; m++)
+				int nx = i + (dx[arr[i][j].d])* ss;
+				int ny = j+ (dy[arr[i][j].d])* ss;
+				int idir = arr[i][j].d;
+				while (true)
 				{
-					if ((x + dir_x <= 0 || x + dir_x >= R + 1 || y + dir_y <= 0 || y + dir_y >= C + 1)
-						)
-					{
 
-						dir_x = dx[(arr[i][j].d + 2) % 4];
-						dir_y = dy[(arr[i][j].d + 2) % 4];
-
-						arr[i][j].d = (arr[i][j].d + 2) % 4;
-					}
-					x += dir_x;
-					y += dir_y;
-
+					if (nx >= 0 && nx < R && ny >= 0 && ny < C)
+						break;
+					if (idir == 3 && ny < 0) {
+						ss -= y; y = 0; idir = 1; }
+					else if (idir == 1 && ny >= C) { ss -= C -1- y; y = C - 1; idir = 3; }
+					else if (idir == 2 && nx >= R) { ss -= R - 1-x; x = R - 1; idir = 0; }
+					else if (idir == 0 && nx < 0) { ss -= x; x = 0; idir = 2; }
+					nx = x +  ss*dx[idir];
+					ny = y + ss * dy[idir];
 				}
-				if (cop[x][y].z != 0 && arr[i][j].z > cop[x][y].z
-					|| cop[x][y].z == 0)
+				if (cop[nx][ny].z != 0 && arr[i][j].z > cop[nx][ny].z
+					|| cop[nx][ny].z == 0)
 				{
-					cop[x][y] = arr[i][j];
+					cop[nx][ny] = arr[i][j];
+					cop[nx][ny].d=idir;
 
 				}
 				arr[i][j].s = 0;
@@ -54,13 +60,14 @@ void mov()
 			}
 		}
 	}
-	for (int i = 1; i <= R; i++)
+	for (int i = 0; i < R; i++)
 	{
-		for (int j = 1; j <= C; j++)
+		for (int j = 0; j < C; j++)
 		{
 			arr[i][j] = cop[i][j];
 		}
 	}
+
 }
 
 int main()
@@ -73,19 +80,19 @@ int main()
 	for (int i = 0; i < M; i++)
 	{
 		cin >> r >> c >> s >> d >> z;
-		arr[r][c].s = s;
+		arr[r-1][c-1].s = s;
 		if (d == 2)
-			arr[r][c].d = 3 - 1;
+			arr[r-1][c-1].d = 3 - 1;
 		else if (d == 3)
-			arr[r][c].d = 2 - 1;
+			arr[r-1][c-1].d = 2 - 1;
 		else
-			arr[r][c].d = d - 1;
-		arr[r][c].z = z;
+			arr[r-1][c-1].d = d - 1;
+		arr[r-1][c-1].z = z;
 	}
 	int sum = 0;
-	for (int i = 1; i <= C; i++)
+	for (int i = 0; i < C; i++)
 	{
-		for (int j = 1; j <= R; j++)
+		for (int j = 0; j < R; j++)
 		{
 			if (arr[j][i].z != 0)
 			{
