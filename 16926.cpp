@@ -17,7 +17,7 @@ bool visit[301][301];
 //남동북서
 bool check(int x, int y)
 {
-	if (x >= 0 && x < n&& y >= 0 && y < m)
+	if (x >= 0 && x < n && y >= 0 && y < m)
 		return true;
 	else
 		return false;
@@ -32,10 +32,10 @@ void mov(int x, int y, int dir)
 			arr[x + 1][y] = tmp[x][y];
 			mov(x + 1, y, 0);
 		}
-		else if(!visit[x][y+1] && check(x, y+1))
+		else if (!visit[x][y + 1] && check(x, y + 1))
 		{
-			arr[x][y+1] = tmp[x][y];
-			mov(x, y+1, 1);
+			arr[x][y + 1] = tmp[x][y];
+			mov(x, y + 1, 1);
 		}
 		return;
 	}
@@ -46,10 +46,10 @@ void mov(int x, int y, int dir)
 			arr[x][y + 1] = tmp[x][y];
 			mov(x, y + 1, 1);
 		}
-		else if (!visit[x-1][y] && check(x-1, y))
+		else if (!visit[x - 1][y] && check(x - 1, y))
 		{
-			arr[x-1][y] = tmp[x][y];
-			mov(x-1, y, 2);
+			arr[x - 1][y] = tmp[x][y];
+			mov(x - 1, y, 2);
 		}
 		return;
 	}
@@ -60,10 +60,10 @@ void mov(int x, int y, int dir)
 			arr[x - 1][y] = tmp[x][y];
 			mov(x - 1, y, 2);
 		}
-		else if (!visit[x][y-1] && check(x, y-1))
+		else if (!visit[x][y - 1] && check(x, y - 1))
 		{
-			arr[x][y-1] = tmp[x][y];
-			mov(x, y-1, 3);
+			arr[x][y - 1] = tmp[x][y];
+			mov(x, y - 1, 3);
 		}
 		else if (visit[x][y - 1] && check(x, y - 1))
 		{
@@ -79,7 +79,7 @@ void mov(int x, int y, int dir)
 			arr[x][y - 1] = tmp[x][y];
 			mov(x, y - 1, 3);
 		}
-		else if(visit[x][y - 1] && check(x, y - 1))
+		else if (visit[x][y - 1] && check(x, y - 1))
 		{
 			arr[x][y - 1] = tmp[x][y];
 			return;
@@ -103,16 +103,12 @@ int main() {
 	while (r--)
 	{
 		memset(visit, 0, sizeof(visit));
-		for (int i = 0; i < n; i++)
+		for (int i = 0; i < min(n,m); i++)
 		{
-			for (int j = 0; j < m; j++)
-			{
-				if (i == j && !visit[i][j])
-				{
-					mov(i, j, 0);
-				}
-			}
+			if (!visit[i][i])
+				mov(i, i, 0);
 		}
+
 		for (int i = 0; i < n; i++)
 		{
 			for (int j = 0; j < m; j++)
@@ -122,7 +118,7 @@ int main() {
 		}
 
 	}
-	
+
 	for (int i = 0; i < n; i++)
 	{
 		for (int j = 0; j < m; j++)
@@ -131,6 +127,6 @@ int main() {
 		}
 		cout << '\n';
 	}
-	
+
 	return 0;
 }
