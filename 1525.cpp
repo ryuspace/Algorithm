@@ -1,73 +1,74 @@
 //https://www.acmicpc.net/problem/1525
-/*풀이 : 0이 있는 곳을 기준으로 왼쪽 오른쪽 위 아래 위치를 바꾼다.(방문되지 않은 경우에만) 방문처리를 위해 map을 사용한다.*/
-
+/*풀이 : 빈 공간을 기준으로 4방향을 탐색해본다. set을 이용하여 이미 방문한
+모양이면 더 방문하지 않게 해준다.*/
 #include <iostream>
 #include <algorithm>
+#include <set>
 #include <string>
-#include <map>
 #include <queue>
 
 using namespace std;
-map<string, int> m;
-queue<string> q;
-string n = "";
 
+typedef pair<int, int> pii;
+int arr[4][4];
 int dx[4] = { -1,1,0,0 };
-int dy[4] = { 0,0,1,-1 };
-//왼쪽 오른쪽 위 아래
-void bfs()
-{
-	m[n] = 0;
-	q.push(n);
-	while (!q.empty())
-	{
-		string front = q.front();
-		q.pop();
-		int idx = front.find('0');
-		int x = idx / 3;
-		int y = idx % 3;
-		
-		for (int i = 0; i < 4; i++)
-		{
-			int nx = x + dx[i];
-			int ny = y + dy[i];
-			if (nx >= 0 && nx <= 2 && ny >= 0 && ny <= 2)
-			{
-				string next = front;
-				swap(next[x * 3 + y], next[nx * 3 + ny]);
+int dy[4] = { 0,0,-1,1 };
 
-				if (m.count(next)==0)
-				{
-					m[next] = m[front] + 1;
-					q.push(next);
-				}
-			}
-		}
-
-	}
-
-}
-int main()
+set <string> s;
+int main(void)
 {
 	ios_base::sync_with_stdio(0);
-	std::cin.tie(0);
-	std::cout.tie(0);
-	int tmp;
-	for (int i = 0; i < 9; i++)
-	{
-		cin >> tmp;
+	cin.tie(0);
+	cout.tie(0);
 
-		n += tmp + '0';
-	}
-	bfs();
-	if (m.count("123456780")==0)
+	string tmp = "";
+	for (int i = 0; i < 3; i++)
 	{
-		cout << -1;
+		for (int j = 0; j < 3; j++)
+		{
+			cin >> arr[i][j];
+			tmp += to_string(arr[i][j]);
+		}
 	}
-	else
+	int time = 0;
+	queue<string> q;
+	q.push(tmp);
+	s.insert(tmp);
+	
+	while (!q.empty())
 	{
-		cout << m["123456780"];
+		int sizz = q.size();
+		while (sizz--)
+		{
+			string front = q.front();
+			q.pop();
+			if (front == "123456780")
+			{
+				cout << time;
+				exit(0);
+			}
+			int idx = front.find('0');
+			int x = idx / 3;
+			int y = idx % 3;
+			for (int i = 0; i < 4; i++)
+			{
+				int nx = x + dx[i];
+				int ny = y + dy[i];
+				if (nx >= 0 && nx < 3 && ny >= 0 && ny < 3)
+				{
+					string cop = front;
+					swap(cop[idx], cop[nx * 3 + ny]);
+					if (s.count(cop) == 0)
+					{
+						s.insert(cop);
+						q.push(cop);
+					}
+				}
+			}
+
+		}
+		time++;
 	}
+	cout << -1;
 	return 0;
-
 }
