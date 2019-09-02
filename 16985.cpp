@@ -1,124 +1,140 @@
 //https://www.acmicpc.net/problem/16985
-/*풀이 : dfs를 이용해서 큐브가 쌓일 수 있는 모든 경우를 탐색 하고, 그 탐색 중에 큐브를
-돌릴 수 있는 모든 가능한 경우도 탐색한다.*/
+/*풀이 : dfs가 여러개 중첩될 때는 가장 시간이 오래 걸리는 dfs부터 실행시켜주자.
+1.순서 정하기 2.돌리기 이 순서로 하는데
+돌릴 때 (0,0)과 (4,4)가 1이 아니면 그 다음 단계인 bfs를 할 필요 없다. 그리고
+12번 이동한 경우가 있으면 이미 최소므로 더 할 필요 없다.
+*/
 #include <iostream>
 #include <algorithm>
 #include <queue>
-#include <cstring>
 using namespace std;
-typedef struct{
-	int x, y, z;
-}point;
-int arr[5][5][5];
-int maze[5][5][5];
-int visit[5];
-bool mapp[5][5][5];
-int maxx = 1e9;
 
-int dx[6] = { 0,0,0,0,-1,1 };
-int dy[6] = { -1,1,0,0,0,0 };
-int dz[6] = { 0,0,1,-1,0,0 };
-int bfs()
+struct point
+{
+	int x, y, z;
+};
+int jemul[5] = { 0,1,2,3,4 };
+int arr[6][6][6];
+int hi[6][6][6];
+bool visit[6];
+bool visit2[6];
+int dx[6] = { -1,1,0,0,0,0 };
+int dy[6] = { 0,0,-1,1,0,0 };
+int dz[6] = { 0,0,0,0,-1,1 };
+int minn = 1e9;
+int play()
 {
 	int cnt = 0;
-	queue <point> q;
+	bool visit3[6][6][6] = { 0, };
+	queue<point> q;
+
 	q.push({ 0,0,0 });
-	memset(mapp, false, sizeof(mapp));
+	visit3[0][0][0] = true;
 	while (!q.empty())
 	{
 		int sizz = q.size();
 		while (sizz--)
 		{
 			point front = q.front();
-			mapp[front.x][front.y][front.z] = true;
 			q.pop();
+			if (front.x == 4 && front.y == 4 && front.z == 4)
+			{
+				return cnt;
+			}
+			if (cnt >= minn)
+				return minn;
 			for (int i = 0; i < 6; i++)
 			{
-				int nx = front.x + dx[i];
-				int ny = front.y + dy[i];
-				int nz = front.z + dz[i];
-				if (nx == 4 && ny == 4 && nz == 4)
-				{
-					return cnt+1;
-				}
-				if (nx >= 0 && nx < 5 && ny >= 0 && ny < 5
-					&& nz >= 0 && nz < 5 && maze[nx][ny][nz]==1 && mapp[nx][ny][nz]==false)
+				int nx = dx[i] + front.x;
+				int ny = dy[i] + front.y;
+				int nz = dz[i] + front.z;
+				if (nx >= 0 && nx < 5 && ny >= 0 && ny < 5 && nz >= 0 && nz < 5 && !visit3[nx][ny][nz] &&
+					hi[nx][ny][nz] == 1)
 				{
 					q.push({ nx,ny,nz });
-					mapp[nx][ny][nz] = true;
+					visit3[nx][ny][nz] = true;
 				}
 			}
+
 		}
 		cnt++;
 	}
 	return 1e9;
 }
-void rotate(int num,int cntt)
+void rot(int num)
 {
-	int tmp[5][5][5];
+	int tmp[6][6] = { 0, };
 	for (int i = 0; i < 5; i++)
 	{
 		for (int j = 0; j < 5; j++)
 		{
-			tmp[num][i][j] = arr[num][4 - j][i];
-		}
-	}
-	for (int i = 0; i < 5; i++)
-	{
-		for (int j = 0; j < 5; j++)
-		{
-			arr[num][i][j] = tmp[num][i][j];//돌린거 다시 복사
-			maze[cntt][i][j] = arr[num][i][j];
+			tmp[i][j] = hi[num][i][j];
 		}
 	}
 
+	for (int i = 0; i < 5; i++)
+	{
+		for (int j = 0; j < 5; j++)
+		{
+			hi[num][i][j] = tmp[4 - j][i];
+		}
+	}
 }
-void dfs(int cnt)
+void dfs2(int cnt)
 {
 	if (cnt == 5)
 	{
-		if (maze[0][0][0] == 1 && maze[4][4][4] == 1)
+		if(hi[4][4][4]==1)
+			minn = min(minn, play());
+		if (minn == 12)
 		{
-			maxx = min(bfs(), maxx);
+			cout << 12;
+			exit(0);
 		}
 		return;
 	}
-	for (int i = 0; i < 5; i++)//i번째 큐브부터 차곡 차곡 쌓을 거다.
+	for (int j = 0; j < 4; j++)
 	{
-		if (visit[i] == false)
-		{
-			visit[i] = true;
-			for (int j = 0; j < 4; j++)//4방향으로 돌리자.
-			{
-				rotate(i,cnt);
-				dfs(cnt + 1);
-			}
-			visit[i] = false;
-		}
-		
+		rot(cnt);
+		if(hi[0][0][0]==1)
+			dfs2(cnt + 1);
 	}
 }
+
 int main()
 {
-	std::ios_base::sync_with_stdio(0);
-	std::cin.tie(0);
-	std::cout.tie(0);
-
-	for (int i = 0; i < 5; i++)
+	//freopen("Text.txt", "r", stdin);
+	ios_base::sync_with_stdio(0);
+	cin.tie(0);
+	cout.tie(0);
+	for (int r = 0; r < 5; r++)
 	{
-		for (int j = 0; j < 5; j++)
+		for (int i = 0; i < 5; i++)
 		{
-			for (int r = 0; r < 5; r++)
+			for (int j = 0; j < 5; j++)
 			{
-				cin >> arr[i][j][r];
+				cin >> arr[r][i][j];
 			}
 		}
 	}
-	dfs(0);
-	if (maxx == 1e9)
+	do
+	{
+		for (int i = 0; i < 5; i++)
+		{
+			for (int j = 0; j < 5; j++)
+			{
+				for (int r = 0; r < 5; r++)
+				{
+					hi[i][j][r] = arr[jemul[i]][j][r];
+				}
+			}
+		}
+		dfs2(0);
+
+	} while (next_permutation(jemul, jemul + 5));
+	if (minn == 1e9)
 		cout << -1;
 	else
-		cout << maxx;
-
+		cout << minn;
 	return 0;
 }
