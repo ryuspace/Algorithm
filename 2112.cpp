@@ -2,102 +2,93 @@
 풀이 : dfs를 이용해 약품을 주입할 위치를 뽑고 맵을 탐색해 성능검사가 통과되는지 파악한다.
 현재 약품을 주입한 갯수의 최소보다 많은 갯수는 탐색할 필요가 없다.
 */
-#include<iostream>
-#include<algorithm>
-#include <cstring>
-int t;
-int d, w, k;
+#include <iostream>
+#include <algorithm>
+
+using namespace std;
+
+int t, d, w, k;
 int arr[14][21];
 bool visit[14];
-using namespace std;
+//0은 A 1은 B;
+int res = 1e9;
 
 bool check()
 {
 	for (int i = 0; i < w; i++)
 	{
-		int cntt = 0;
 		bool flag = false;
-		int num = arr[0][i];
+		int a = 0, b = 0;
 		for (int j = 0; j < d; j++)
 		{
-			if (arr[j][i] == num)
+			if (arr[j][i] == 0)
 			{
-				cntt++;
+				a++;
+				b = 0;
 			}
 			else
 			{
-				if (cntt >= k)
-				{
-					flag = true;
-					break;
-				}
-				else
-				{
-					cntt = 1;
-					num = arr[j][i];
-				}
+				b++;
+				a = 0;
 			}
-
-		}
-		if (cntt >= k)
-		{
-			flag = true;
+			if (a >= k || b >= k)
+			{
+				flag = true;
+				break;
+			}
 		}
 		if (!flag)
 			return false;
 	}
 	return true;
 }
-int minn = 1e9;
-void magic(int idx, int alpa, int cnt)
+void magic(int idx,int hi)
 {
 	for (int i = 0; i < w; i++)
 	{
-		arr[idx][i] = alpa;
-	}
-	if (check())
-	{
-		minn = min(minn, cnt);
+		arr[idx][i] = hi;
 	}
 }
-void dfs(int idx, int cnt)
+void dfs(int idx,int cnt)
 {
-	int tmp[14][21];
-	if (idx >= d || cnt > k || cnt >= minn)
+	if (idx >= d || cnt >= res)
 	{
 		return;
 	}
-	for (int i = 0; i < d; i++)
+	int tmp[21] = { 0, };
+	
+	visit[idx] = true;
+	for (int r = 0; r < w; r++)
 	{
-		for (int j = 0; j < w; j++)
-		{
-			tmp[i][j] = arr[i][j];
-		}
+		tmp[r] = arr[idx][r];
 	}
-	dfs(idx + 1, cnt);//안뿌림..
-	for (int i = 0; i < 2; i++)
+	for (int j = 0; j < 2; j++)
 	{
-		magic(idx, i, cnt);
-		if (minn <= cnt)
-			return;
+		magic(idx, j);
+		if (check())
+		{
+			res = min(res, cnt + 1);
+		}
 		dfs(idx + 1, cnt + 1);
 	}
-	for (int i = 0; i < d; i++)
+	visit[idx] = false;
+	for (int r = 0; r < w; r++)
 	{
-		for (int j = 0; j < w; j++)
-		{
-			arr[i][j] = tmp[i][j];
-		}
+		arr[idx][r]= tmp[r];
 	}
+
+	dfs(idx + 1, cnt);
 }
-int main() {
+int main()
+{
+	freopen("Text.txt", "r", stdin);
 	ios_base::sync_with_stdio(0);
-	//freopen("t.txt", "r", stdin);
+	cin.tie(0);
+	cout.tie(0);
 	cin >> t;
 	for (int r = 1; r <= t; r++)
 	{
-		memset(visit, 0, sizeof(visit));
-		minn = 1e9;
+		res = 1e9;
 		cin >> d >> w >> k;
 		for (int i = 0; i < d; i++)
 		{
@@ -107,17 +98,11 @@ int main() {
 			}
 		}
 		if (check())
-		{
-			cout << "#" << r << " " << 0 << '\n';
-		}
+			res = 0;
 		else
-		{
-			dfs(0, 1);
-			cout << "#" << r << " " << minn << '\n';
-		}
-
-
+			dfs(0, 0);
+		cout << "#" << r << " " << res << '\n';
 	}
-
+	
 	return 0;
 }
