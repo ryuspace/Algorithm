@@ -1,5 +1,4 @@
-//http://codeforces.com/contest/1265/problem/A
-/*풀이 : ?가 나올 때 마다 앞 뒤 문자를 판별하여 적당한 알파벳을 넣어준다. */
+/*풀이 : ?가 나올 때 마다 앞 뒤 문자를 판별하여 적당한 알파벳을 넣어준다. 그리디. */
 #include <iostream>
 #include <algorithm>
 #include <string>
