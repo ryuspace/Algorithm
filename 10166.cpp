@@ -1,19 +1,18 @@
 //https://www.acmicpc.net/problem/10166
-/*풀이 : 원 둘레를 1이라고 생각 . 어떤 분수가 나왔는데 기약분수로 만들었는데 
-분모가 이미 이전에 나왔던 분모면 그 분모는 이전에 무조건 체크가 된 것이다.*/
+/*풀이 : 각도가 같으면 한 자리 밖에 못 놓는다. 각도를 기약분수 형태로 만든 후
+겹치는지 체크한다.
+*/
 #include <iostream>
 #include <algorithm>
 
 using namespace std;
 
-bool check[2001];
-
+bool visit[2001][2001];
 int gcd(int x, int y)
 {
 	if (y == 0)
 		return x;
-	else
-		return gcd(y, x % y);
+	return gcd(y, x % y);
 }
 int main() 
 {
@@ -25,26 +24,21 @@ int main()
 	int cnt = 0;
 	int d1, d2;
 	cin >> d1 >> d2;
-	for (int i = d1; i <= d2; i++)
+	
+	for (int i = d1; i <= d2; i++)//분모
 	{
-		bool check2[2001] = { 0, };
-		for (int j = 1; j <= i; j++)
+		for (int j = 1; j <= i; j++)//분자
 		{
-			int num = gcd(i, j);//gcd를 이용해서 최대공약수를 구해 기약분수로 만든다. 만약 둘이 안 나눠 떨어지면 1로 만들게 해서 순수 분모만 비교하게 한다. 분모가 지금 분모보다 작은데 방문이 되어있으면 이미 나왔던 것이다.
-			if (!check[i/num])
+			int na = gcd(i, j);
+			int x = j / na;
+			int y = i / na;
+			if (!visit[x][y])
 			{
-				check2[i/num] = true;
+				visit[x][y] = true;
 				cnt++;
-				//체크1랑 체크2로 나눈 이유는 현재 turn에서 d1이 10보다 큰데 만약 2/10이랑 4/10이 있다면 체크1이랑 체크2로 나누지 않으면 4/10은 방문되었다고 처리되기 때문이다. 현재 턴에서 방문된 것은 우선은 무시해준다.
 			}
-		}
-		for (int j = 1; j <= i; j++)
-		{
-			if (check2[j])
-				check[j] = true;
 		}
 	}
 	cout << cnt;
 	return 0;
 }
-
