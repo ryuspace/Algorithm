@@ -1,6 +1,7 @@
 //https://www.acmicpc.net/problem/2352
 /*풀이 : 왼쪽 포트가 오른쪽 포트에 연결할 때 오름차순으로 연결하므로 오른쪽 포트에 대해
 LIS를 찾으면 된다.
+
 */
 #include <iostream>
 #include <algorithm>
@@ -29,7 +30,7 @@ int main(void)
 		}
 		else
 		{
-			*iter = a;
+			*iter = a;//대체 가능하다. 기존에 있던 값 보다 더 작은 값으로 바꾸는 거니깐! 이해가 안 가면 경우를 만들어서 수를 삽입해보자.
 		}
 	}
 	cout << v.size();
