@@ -16,8 +16,8 @@ struct point
 {
 	int x, y1, y2, gap;
 };
-long long int cnt[800008];
-long long int gesu[800008];
+long long int cnt[800008]; //이 구간 노드에 겹치는 여부 체크
+long long int gesu[800008];//이 구간 이하로 겹치는 y좌표 
 vector<ll> yy;
 vector<point> v;
 bool cmp(point& a, point& b)
@@ -82,6 +82,7 @@ long long solution(vector<vector<int> > rectangles)
 			ans += (v[i].x - v[i - 1].x) * gesu[1];
 		}
 		update(0, yy.size() - 1, getidx(v[i].y1), getidx(v[i].y2) - 1, v[i].gap, 1);
+		//이 부분에서 애를 많이 먹었다..
 		//만약 0~n까지의 인덱스의 좌표를 구해야 하는데 세그먼트 트리 특징상 하나의 노드에서 겹쳤다고 
 		//표시가 나면 그건 y의 구간으로 볼 수 없다. 그래서 애초에 0~n-1까지 탐색하고 겹치는 좌표가 생겼을 때 구간을 end+1~start라고 보면 해결된다.
 
