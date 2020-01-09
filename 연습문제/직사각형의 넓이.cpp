@@ -87,37 +87,4 @@ long long solution(vector<vector<int> > rectangles)
 	}
 	return ans;
 }
-int main()
-{
-	ios_base::sync_with_stdio(0);
-	cin.tie(0);
-	cout.tie(0);
-	int ans = 0;
-	int n;
-	cin >> n;
-	for (int i = 0; i < n; i++)
-	{
-		int x1, y1, x2, y2;
-		cin >> x1 >> y1 >> x2 >> y2;
-		v.push_back({ x1,y1,y2,1 });
-		v.push_back({ x2,y1,y2,-1 });
-		yy.push_back(y1);
-		yy.push_back(y2);
-	}
-	sort(v.begin(), v.end(), cmp);
-	sort(yy.begin(), yy.end());
-	yy.erase(unique(yy.begin(), yy.end()), yy.end());
-	for (int i = 0; i < v.size(); i++)
-	{
-		if (i != 0)
-		{
-			ans += (v[i].x - v[i - 1].x) * gesu[1];
-		}
-		update(0, yy.size() - 1, getidx(v[i].y1), getidx(v[i].y2) - 1, v[i].gap, 1);
-		//만약 0~n까지의 인덱스의 좌표를 구해야 하는데 세그먼트 트리 특징상 하나의 노드에서 겹쳤다고 
-		//표시가 나면 그건 y의 구간으로 볼 수 없다. 그래서 애초에 0~n-1까지 탐색하고 겹치는 좌표가 생겼을 때 구간을 end+1~start라고 보면 해결된다.
 
-	}
-	cout << ans;
-	return 0;
-}
