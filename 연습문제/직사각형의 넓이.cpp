@@ -62,18 +62,15 @@ long long solution(vector<vector<int> > rectangles)
 	long long int ans = 0;
 	for (int i = 0; i < rectangles.size(); i++)
 	{
-		for (int j = 0; j < 4; j++)
-		{
-			int x1, y1, x2, y2;
-			x1 = rectangles[i][0];
-			y1 = rectangles[i][1];
-			x2 = rectangles[i][2];
-			y2 = rectangles[i][3];
-			v.push_back({ x1,y1,y2,1 });
-			v.push_back({ x2,y1,y2,-1 });
-			yy.push_back(y1);
-			yy.push_back(y2);
-		}
+		int x1, y1, x2, y2;
+		x1 = rectangles[i][0];
+		y1 = rectangles[i][1];
+		x2 = rectangles[i][2];
+		y2 = rectangles[i][3];
+		v.push_back({ x1,y1,y2,1 });
+		v.push_back({ x2,y1,y2,-1 });
+		yy.push_back(y1);
+		yy.push_back(y2);
 	}
 	sort(v.begin(), v.end(), cmp);
 	sort(yy.begin(), yy.end());
