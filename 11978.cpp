@@ -3,92 +3,101 @@
 만약 이미 방문된 경우 현재 시간에 전에 방문한 시간을 빼준 값과 min값을 비교한다. min은  현재 시간에 전에 방문한 시간을 빼준 값의 최소 */
 #include <iostream>
 #include <algorithm>
-#include <string>
-#include <vector>
+#include <cmath>
 
 using namespace std;
 
+int n;
 int arr[4004][4004];
-
 int main()
 {
-	int n;
+	ios_base::sync_with_stdio(0);
+	cin.tie(0);
+	cout.tie(0);
+
+	int x = 1000, y = 1000, time = 0;
+	int minn = 1e9;
+	char dir;
+	int num;
+
 	cin >> n;
-	char tmp;
-	int dir;
-	int now = 0;
-	int x = 1000;
-	int y = 1000;
-	int Min = 1e9;
+	for (int i = 0; i < 4004; i++)
+	{
+		for (int j = 0; j < 4004; j++)
+		{
+			arr[i][j] = 1e9;
+		}
+	}
+
+	arr[x][y] = 0;
+	//cout << x << " " << y << " " << arr[x][y] << '\n';
 	for (int i = 0; i < n; i++)
 	{
-		cin >> tmp >> dir;
-
-		if (tmp == 'N')
+		//cout << x << " " << y << " " << arr[x][y] << '\n';
+		cin >> dir >> num;
+		if (dir == 'N')
 		{
-			for (int j = 1; j <= dir; j++)
+			for (int j = 0; j < num; j++)
 			{
-				now++;
+
 				x--;
-				if (arr[x][y] != 0)
+				time++;
+				//cout << x << " " << y << " " << arr[x][y] << '\n';
+				if (arr[x][y] != 1e9)
 				{
-					Min = min(Min, now - arr[x][y]);
+					minn = min(minn, time - arr[x][y]);
 				}
-				arr[x][y] = now;
-
+				arr[x][y] = time;
 			}
 		}
-		else if (tmp == 'E')
+		else if (dir == 'E')
 		{
-			for (int j = 1; j <= dir; j++)
+			for (int j = 0; j < num; j++)
 			{
-				now++;
 				y++;
-				if (arr[x][y] != 0)
+				time++;
+				if (arr[x][y] != 1e9)
 				{
+					minn = min(minn, time - arr[x][y]);
 
-					Min = min(Min, now - arr[x][y]);
 				}
-				arr[x][y] = now;
+				arr[x][y] = time;
 			}
 		}
-		else if (tmp == 'S')
+		else if (dir == 'S')
 		{
-			for (int j = 1; j <= dir; j++)
+			for (int j = 0; j < num; j++)
 			{
-				now++;
 				x++;
-				if (arr[x][y] != 0)
+				time++;
+				//cout << x << " " << y << " " << arr[x][y] << '\n';
+				if (arr[x][y] != 1e9)
 				{
 
-					Min = min(Min, now - arr[x][y]);
+					minn = min(minn, time - arr[x][y]);
 				}
-				arr[x][y] = now;
+				arr[x][y] = time;
 			}
 		}
 		else
 		{
-			for (int j = 1; j <= dir; j++)
+			for (int j = 0; j < num; j++)
 			{
-				now++;
 				y--;
-				if (arr[x][y] != 0)
+				time++;
+				if (arr[x][y] != 1e9)
 				{
-					Min = min(Min, now - arr[x][y]);
+					minn = min(minn, time - arr[x][y]);
 				}
-				arr[x][y] = now;
-
+				arr[x][y] = time;
 			}
 		}
-
 	}
-	if (Min == 1e9)
-	{
+	if (minn == 1e9)
 		cout << -1;
-	}
 	else
-	{
-		cout << Min;
-	}
+		cout << minn;
+
+	
 	return 0;
 }
