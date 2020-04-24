@@ -1,52 +1,57 @@
 /*
-풀이 : now일(밀가루를 며칠까지 버틸 수 있는지)
-이전까지 수급 받을 수 있는 날짜 중 가장 많이 밀가루를 받을 수 있는 날짜를 선택한다. 
-k일 이상 버틸 수 있으면 break 한다.
-k일에는 받을 필요 없는거 주의.
+풀이 : 0일부터 k-1일까지 반복문을 돌려서
+매일 재고가 있는 상태인지 체크하고 없으면
+받을 수 있는 밀가루 중 가장 큰 무게를 선택한다.
 */
 #include <iostream>
 #include <algorithm>
 #include <vector>
+#include <string>
+#include <vector>
+#include <cstring>
+#include <string.h>
+#include <stdlib.h>
+#include <map>
 #include <queue>
+#include <cmath>
 #include <functional>
-
 using namespace std;
 typedef pair<int, int> pii;
-
-int solution(int stock, vector<int> dates, vector<int> supplies, int k) 
-{
-	priority_queue<pii, vector<pii>, less<pii> >pq;
-	int now = 0,idx=0,cnt=0;
-	now += stock;
-	while (true)
+priority_queue<pii, vector<pii>, less<pii> >pq;
+queue<pii> q;
+int solution(int stock, vector<int> dates, vector<int> supplies, int k) {
+	//int answer = 0;
+	//return answer;
+	for (int i = 0; i < dates.size(); i++)
 	{
-		//cout << dates[idx] << " " << now << '\n';
-		while (idx < dates.size() && dates[idx] <= now)
+		q.push({ supplies[i],dates[i] });
+	}
+	int cnt = 0;
+	for (int i = 0; i < k; i++)
+	{
+		if (q.front().second == i)
 		{
-			pq.push({ supplies[idx],dates[idx] });
-			idx++;
+			pq.push(q.front());
+			q.pop();
 		}
-		if (!pq.empty() && now < k)
+		if (stock == 0)
 		{
-			now += pq.top().first;
+			pii front = pq.top();
 			pq.pop();
+			stock += front.first;
 			cnt++;
+
 		}
-		else
-		{
-			break;
-		}
+		
+		stock--;
 	}
 	return cnt;
-
 }
+int main()
+{
+	ios_base::sync_with_stdio(0);
+	cin.tie(0);
+	cout.tie(0);
 
-//int main()
-//{
-//	ios_base::sync_with_stdio(0);
-//	cin.tie(0);
-//	cout.tie(0);
-//	
-//	cout<<solution(4, { 1,2,3,4}, { 1,1,1,1 }, 6);
-//	return 0;
-//}
+	return 0;
+}
