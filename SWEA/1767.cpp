@@ -6,131 +6,120 @@ sort를 적절히 구현해서 가장 많이 코어가 연결 될 때 최소 전
 */
 #include <iostream>
 #include <algorithm>
+#include <cstring>
 #include <vector>
-
 using namespace std;
 
 typedef pair<int, int> pii;
+int t, n;
 int arr[13][13];
-int t,n;
+vector<pii> v;
+vector<pii> hubo;
+
 int dx[4] = { -1,1,0,0 };
 int dy[4] = { 0,0,-1,1 };
-vector <pii> core;
-vector <pii> si;
 
-bool cmp(pii& a, pii& b)
+bool cmp(const pii& a, const pii& b)
 {
 	if (a.first > b.first)
-		return 1;
-	if (a.first == b.first)
 	{
-		if (a.second < b.second)
-			return 1;
-		else
-			return 0;
+		return true;
 	}
-	if (a.first < b.first)
-		return 0;
+	else if (a.first == b.first)
+	{
+		return a.second < b.second;
+	}
+	else
+	{
+		return false;
+	}
+
 }
 bool check(int x, int y, int dir)
 {
-	while (!(x < 0 || x >= n || y < 0 || y >= n))
+	int xx = x;
+	int yy = y;
+
+	while (xx >= 0 && xx < n && yy >= 0 && yy < n)
 	{
-		if (arr[x][y] == 2 || arr[x][y] == 1)
+		if (arr[xx][yy] != 0)
+		{
 			return false;
-		x += dx[dir];
-		y += dy[dir];
+		}
+		xx += dx[dir];
+		yy += dy[dir];
 	}
 	return true;
 }
-void bim(int x, int y, int dir)
-{
-	while (!(x < 0 || x >= n || y < 0 || y >= n))
-	{
-		arr[x][y] = 2;
-		x += dx[dir];
-		y += dy[dir];
-	}
 
-}
-void dfs(int pro,int cnt)
+int paint(int x, int y, int dir, int color)
 {
-	if (cnt == core.size())
+	int sum = 0;
+	int xx = x;
+	int yy = y;
+
+	while (xx >= 0 && xx < n && yy >= 0 && yy < n)
 	{
-		int sum = 0;
-		for (int i = 0; i < n; i++)
-		{
-			for (int j = 0; j < n; j++)
-			{
-				if (arr[i][j] == 2)
-					sum++;
-			}
-		}
-		si.push_back({ pro,sum });
+		arr[xx][yy] = color;
+		sum++;
+		xx += dx[dir];
+		yy += dy[dir];
+	}
+	return sum;
+}
+
+void go(int me, int cnt, int sum)
+{
+	if (cnt == v.size())
+	{
+		hubo.push_back({ me,sum });
 		return;
 	}
-	int tmp[13][13];
-	for (int r = 0; r < n; r++)
-	{
-		for (int j = 0; j < n; j++)
-		{
-			tmp[r][j] = arr[r][j];
-		}
-	}
 	bool flag = false;
-	for (int i = 0; i <4; i++)
+	for (int i = 0;i < 4;i++)
 	{
-		int nx = dx[i] + core[cnt].first;
-		int ny = dy[i] + core[cnt].second;
-		if (nx >= 0 && nx < n && ny >= 0 && ny < n)
+		int nx = dx[i] + v[cnt].first;
+		int ny = dy[i] + v[cnt].second;
+		if (check(nx, ny, i))
 		{
-			if (check(nx, ny, i))
-			{
-				flag = true;
-				bim(nx, ny, i);
-				dfs(pro+1,cnt + 1);
-				for (int r = 0; r < n; r++)
-				{
-					for (int j = 0; j < n; j++)
-					{
-						arr[r][j] = tmp[r][j];
-					}
-				}
-			}
+			flag = true;
+			int hi = paint(nx, ny, i, 2);
+			go(me + 1, cnt + 1, sum + hi);
+			paint(nx, ny, i, 0);
 		}
-
 	}
-	if(!flag)
-		dfs(pro,cnt + 1);
+	if (!flag)
+	{
+		go(me, cnt + 1, sum);
+	}
+
 }
 int main()
 {
-	freopen("Text.txt","r", stdin);
-	ios_base::sync_with_stdio(0);
-	cin.tie(0);
-	cout.tie(0);
+
+	//freopen("Test.txt", "r", stdin);
 	cin >> t;
-	for (int r = 1; r <= t; r++)
+
+	for (int i = 1;i <= t;i++)
 	{
-		si.clear();
-		core.clear();
+		hubo.clear();
+		v.clear();
 		cin >> n;
-		for (int i = 0; i < n; i++)
+		for (int i = 0;i < n;i++)
 		{
-			for (int j = 0; j < n; j++)
+			for (int j = 0;j < n;j++)
 			{
 				cin >> arr[i][j];
-				if (i != 0 && j != 0 &&i!=n-1&&j!=n-1&& arr[i][j] == 1)
+				if (i != 0 && i != n - 1 && j != 0 && j != n - 1 && arr[i][j] == 1)
 				{
-					core.push_back({ i,j });
+					v.push_back({ i,j });
 				}
 			}
 		}
-		dfs(0,0);
-		sort(si.begin(), si.end(), cmp);
-		cout << "#" << r << " " << si[0].second << '\n';
+		go(0, 0, 0);
+		sort(hubo.begin(), hubo.end(), cmp);
+		cout << "#" << i << " " << hubo[0].second << '\n';
 
 	}
 	return 0;
 }
-
