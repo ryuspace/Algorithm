@@ -1,9 +1,7 @@
 //https://www.acmicpc.net/problem/10021
 /*풀이 :
 파이프를 연결하는 간선의 가중치가 C이상인 것들만 연결을 표시하고 프림 알고리즘을 이용해서 최소 스패닝 트리를 구한다.
-시간복잡도 (E*log(E))
-4000000*log(4000000) => 약 8400만 시간 개선이 조금 필요하다/
-
+시간복잡도 (E*E +V*log(E))
 */
 #include <iostream>
 #include <algorithm>
