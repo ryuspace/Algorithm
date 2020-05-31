@@ -3,162 +3,141 @@
 #include <iostream>
 #include <algorithm>
 #include <vector>
-#include <algorithm>
 #include <queue>
+#include <cstring>
 using namespace std;
 
 typedef pair<int, int> pii;
-int n, m, d;
-int arr[17][17];
-int dx[3] = { 0,-1,0 };
-int dy[3] = { -1,0,1 };
-bool vis[17];
-bool target[17][17];//죽은 적을 표시하자.
-vector <pii> acher;
 
-bool cmp(pii& a, pii& b)
+int n, m, d;
+int arr[18][18];
+int arr2[18][18];
+bool visit[18];
+bool check[18][18];
+bool victim[18][18];
+
+int maxi;
+vector<pii> gung;
+
+int dx[4] = { 0,-1,0 };
+int dy[4] = { -1,0 ,1};
+
+
+void mapDown()
 {
-	if (a.second < b.second)
-		return 1;
-	else
-		return 0;
+	for (int i = n-2;i>=0;i--)
+	{
+		for (int j = 0;j < m;j++)
+		{
+			arr[i + 1][j] = arr[i][j];
+		}
+	}
+	for (int j = 0;j < m;j++)
+	{
+		arr[0][j] = 0;
+	}
 }
 
 void bfs(pii start)
 {
+	memset(check, 0, sizeof(check));
 	int cnt = 0;
-	bool visit[17][17] = { 0, };
 	queue<pii> q;
+	vector<pii> hubo;
 	q.push(start);
-	visit[start.first][start.second] = true;
+	check[start.first][start.second] = true;
 	while (!q.empty())
 	{
 		int sizz = q.size();
 		while (sizz--)
 		{
-			pii front =q.front();
+			pii front = q.front();
 			q.pop();
-
-			for (int i = 0; i < 3; i++)
+			for (int i = 0;i < 3;i++)
 			{
 				int nx = dx[i] + front.first;
 				int ny = dy[i] + front.second;
-				if (nx >= 0 && nx < n && ny >= 0 && ny < m && !visit[nx][ny] &&cnt+1<=d)
+				if (nx >= 0 && nx < n && ny >= 0 && ny < m && !check[nx][ny])
 				{
-					if (arr[nx][ny] == 0)
+					if (arr[nx][ny] == 1)
 					{
-						q.push({ nx,ny });
-						visit[nx][ny] = true;
-					}
-					else
-					{
-						target[nx][ny] = true;
+						victim[nx][ny] = true;
 						return;
 					}
+					check[nx][ny] = true;
+					q.push({ nx,ny });
 				}
 			}
 		}
-
 		cnt++;
+		if (cnt == d)
+			break;
+	
 	}
-
 }
-bool check()
+
+bool isPossible()
 {
-	for (int i = 0; i < n; i++)
+	for (int i = 0;i < n;i++)
 	{
-		for (int j = 0; j < m; j++)
+		for (int j = 0;j < m;j++)
 		{
 			if (arr[i][j] == 1)
-				return true;
+				return false;
 		}
 	}
-	return false;
+	return true;
 }
-int maxx = 0;
-void movv()
+
+int play()
 {
-	int cop[17][17];
-	for (int i = 0; i < n; i++)
+	int sum = 0;
+	while (!isPossible())
 	{
-		for (int j = 0; j < m; j++)
+		for (int i = 0;i < 3;i++)
 		{
-			cop[i][j] = arr[i][j];
+			bfs(gung[i]);
 		}
-	}
-	
-	for (int i = 1; i < n; i++)
-	{
-		for (int j = 0; j < m; j++)
+
+		for (int i = 0;i < n;i++)
 		{
-			arr[i][j] = cop[i - 1][j];
-		}
-	}
-	for (int j = 0; j < m; j++)
-		arr[0][j] = 0;
-}
-void play()
-{
-	int cnt = 0;
-	while (check())
-	{
-		for (int i = 0; i < acher.size(); i++)
-		{
-			bfs({ acher[i].first,acher[i].second });
-		}
-		for (int i = 0; i < n; i++)
-		{
-			for (int j = 0; j < m; j++)
+			for (int j = 0;j < m;j++)
 			{
-				if (target[i][j])
+				if (victim[i][j])
 				{
-					cnt++;
-					target[i][j] = false;
 					arr[i][j] = 0;
+					sum++;
+					victim[i][j] = false;
 				}
 			}
 		}
-		movv();
+		mapDown();
 	}
-	maxx = max(maxx, cnt);
-	
+	return sum;
+
 }
-void dfs(int cnt,int idx)
+
+void dfs(int idx,int cnt) //궁수 위치 선택
 {
 	if (cnt == 3)
 	{
-		int cop[17][17];
-		for (int i = 0; i < n; i++)
+		maxi=max(maxi,play());
+		for (int i = 0;i < n;i++)
 		{
-			for (int j = 0; j < m; j++)
+			for (int j = 0;j < m;j++)
 			{
-				cop[i][j] = arr[i][j];
-			}
-		}
-		play();
-		for (int i = 0; i < n; i++)
-		{
-			for (int j = 0; j < m; j++)
-			{
-				arr[i][j] = cop[i][j];
+				arr[i][j] = arr2[i][j];
 			}
 		}
 		return;
 	}
 	if (idx >= m)
 		return;
-	
-	for (int i = idx; i < m; i++)
-	{
-		if (!vis[i])
-		{
-			vis[i] = true;
-			acher.push_back({ n,i });
-			dfs(cnt + 1,i+1);
-			acher.pop_back();
-			vis[i] = false;
-		}
-	}
+
+	gung.push_back({ n, idx });
+	dfs(idx + 1, cnt + 1);
+	gung.pop_back();
+	dfs(idx + 1, cnt);
 }
 int main()
 {
@@ -166,15 +145,15 @@ int main()
 	cin.tie(0);
 	cout.tie(0);
 	cin >> n >> m >> d;
-	for (int i = 0; i < n; i++)
+	for (int i = 0;i < n;i++)
 	{
-		for (int j = 0; j < m; j++)
+		for (int j = 0;j < m;j++)
 		{
 			cin >> arr[i][j];
+			arr2[i][j] = arr[i][j];
 		}
 	}
 	dfs(0,0);
-	cout << maxx;
+	cout << maxi;
 	return 0;
 }
-
