@@ -1,5 +1,8 @@
 //https://www.acmicpc.net/problem/17135
-/*풀이 : dfs를 이용해 궁수 위치 선택. bfs를 이용해 모든 궁수가 잡을 수 있는 적을 찾는다.*/
+/*풀이 : dfs를 이용해 궁수 위치 선택.
+bfs를 이용해 모든 궁수가 잡을 수 있는 적을 찾는다.
+처음엔 상하좌우 방문해서 sort 열 오름차순으로 했는데 방향 접근을 서쪽 북쪽 동쪽으로 하면 그런 과정이 필요가 없어진다.
+*/
 #include <iostream>
 #include <algorithm>
 #include <vector>
