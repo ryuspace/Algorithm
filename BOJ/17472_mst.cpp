@@ -2,85 +2,76 @@
 /*풀이
 1.섬들을 라벨링 하자
 2.라벨링한 섬들의 좌표를 하나로 묶자
-3.라벨링한 섬을 한개로 보고 다른 섬이 나올 때 까지 가능한 최소거리의 다리를 만들자
+3.라벨링한 섬을 한개로 보고 다른 섬이 나올 때 까지 가능한 다리를 만들자
 4. MST를 이용하여 최단경로를 구한다.
 */
 #include <iostream>
 #include <algorithm>
+#include <cstring>
 #include <vector>
 #include <queue>
-#include <cmath>
 using namespace std;
+
 typedef pair<int, int> pii;
-struct point
-{
-	int x, y, z;
-};
+
 int n, m;
 int arr[11][11];
-vector<pii> v[11];
 bool visit[11][11];
+queue<pii> q;
 int dx[4] = { -1,1,0,0 };
 int dy[4] = { 0,0,-1,1 };
-int idx = 1;
-int con[11][11];
-bool con2[11][11];
-int parent[11];
-vector<point> ans;
 
+int color = 1;
+int label[11][11];
+int parent[7];
 
-void sel(pii start, int dir)
+struct point
 {
-	int num = arr[start.first][start.second];
+	int x, y, gap;
+};
+
+
+bool cmp(point& a, point& b)
+{
+	return a.gap < b.gap;
+}
+
+vector<point> v;
+void go(pii start, int dir,int color)
+{
+	int cnt = 0;
 	int nx = start.first + dx[dir];
 	int ny = start.second + dy[dir];
-	while (true)
+	while (nx >= 0 && nx < n && ny >= 0 && ny < m)
 	{
-		int len = (abs(start.first - nx) + abs(start.second - ny)) - 1;
-		if (!(nx >= 0 && nx < n && ny >= 0 && ny < m))
+		cnt++;
+		if (label[nx][ny] == color)
+			break;
+		if (label[nx][ny] != 0 && label[nx][ny] != color)
 		{
+			cnt--;
 			break;
 		}
-		if (arr[nx][ny] == num)
-			break;
-		if (arr[nx][ny] != num && arr[nx][ny] != 0)
-		{
-			if (len >= 2 && con[num][arr[nx][ny]] > len)
-			{
-				con[num][arr[nx][ny]] = len;
-				con[arr[nx][ny]][num] = len;
-			}
-			break;
-		}
-
 		nx += dx[dir];
 		ny += dy[dir];
 	}
-}
-void go(int idx)
-{
 
-	for (int i = 0; i < v[idx].size(); i++)
+	if (nx >= 0 && nx < n && ny >= 0 && ny < m && label[nx][ny] != 0 && label[nx][ny] != color && cnt>=2)
 	{
-		for (int j = 0; j < 4; j++)
-		{
-			sel(v[idx][i], j);
-		}
+		v.push_back({ color,label[nx][ny],cnt });
 	}
-
 }
-void bfs(pii start, int idx)
+void bfs(pii start, int num)
 {
-	queue<pii> q;
-	q.push(start);
 	visit[start.first][start.second] = true;
-	v[idx].push_back(start);
-	arr[start.first][start.second] = idx;
+	q.push(start);
+	label[start.first][start.second] = color;
+
 	while (!q.empty())
 	{
 		pii front = q.front();
 		q.pop();
-		for (int i = 0; i < 4; i++)
+		for (int i = 0;i < 4;i++)
 		{
 			int nx = dx[i] + front.first;
 			int ny = dy[i] + front.second;
@@ -88,121 +79,91 @@ void bfs(pii start, int idx)
 			{
 				q.push({ nx,ny });
 				visit[nx][ny] = true;
-				v[idx].push_back({ nx,ny });
-				arr[nx][ny] = idx;
+				label[nx][ny] = color;
 			}
 		}
 	}
-
 }
 
-int find(int a)
+int findd(int a)
 {
 	if (a == parent[a])
-	{
 		return a;
-	}
-	else
-	{
-		return parent[a] = find(parent[a]);
-	}
+	return parent[a] = findd(parent[a]);
 }
-bool cmp(const point& a, const point& b)
+
+void uni(int a, int b)
 {
-	if (a.z < b.z)
-	{
-		return true;
-	}
-	else
-	{
-		return false;
-	}
-}
-void Union(int a, int b)
-{
-	a = find(a);
-	b = find(b);
 	if (a < b)
+	{
+		parent[a] = b;
+	}
+	else
 	{
 		parent[b] = a;
 	}
-	else
-		parent[a] = b;
 }
-int main(void)
+int main()
 {
+	//freopen("Test.txt", "r", stdin);
 	ios_base::sync_with_stdio(0);
 	cin.tie(0);
 	cout.tie(0);
 
 	cin >> n >> m;
-	for (int i = 0; i < n; i++)
+
+	for (int i = 0;i < n;i++)
 	{
-		for (int j = 0; j < m; j++)
+		for (int j = 0;j < m;j++)
 		{
 			cin >> arr[i][j];
-			con[i][j] = 1e9;
 		}
 	}
 
-	for (int i = 0; i < n; i++)
+	for (int i = 0;i < n;i++)
 	{
-		for (int j = 0; j < m; j++)
+		for (int j = 0;j < m;j++)
 		{
-			if (!visit[i][j] && arr[i][j] == 1)
+			if (arr[i][j] == 1 && !visit[i][j])
 			{
-				bfs({ i,j }, idx);
-				idx++;
+				bfs({ i,j },color);
+				color++;
 			}
 		}
 	}
-	idx--;
+	//라벨링 완료
 
-	for (int i = 1; i <=idx; i++)
+	for (int i = 0;i < n;i++)
 	{
-		for (int j = 1; j <=idx; j++)
+		for (int j = 0;j < m;j++)
 		{
-			con[i][j] = 1e9;
-		}
-	}
-	for (int i = 1; i <= idx; i++)
-	{
-		go(i);
-	}
-	for (int i = 1; i <= idx; i++)
-	{
-		for (int j = 1; j <= idx; j++)
-		{
-			if (!con2[i][j] && con[i][j] != 1e9 && con[i][j] >= 2)
+			for (int r = 0;r < 4;r++)
 			{
-				ans.push_back({ i, j, con[i][j] });
-				ans.push_back({ j, i, con[i][j] });
-				con2[i][j] = true;
-				con2[j][i] = true;
+				if(label[i][j]!=0)
+					go({ i,j }, r,label[i][j]);
 			}
 		}
 	}
-	int sum = 0;
-	sort(ans.begin(), ans.end(), cmp);
-	for (int i = 1; i <= idx; i++)
+	sort(v.begin(), v.end(), cmp);
+
+	for (int i = 1;i < color;i++)
 	{
 		parent[i] = i;
 	}
-	for (int i = 0; i < ans.size(); i++)
+	int sum = 0;
+	for (int i = 0;i < v.size();i++)
 	{
-		int a = find(ans[i].x);
-		int b = find(ans[i].y);
-		if (parent[a] != parent[b])
+		if (findd(parent[v[i].x]) != findd(parent[v[i].y]))
 		{
-			Union(a, b);
-			sum += ans[i].z;
+			uni(findd(parent[v[i].x]), findd(parent[v[i].y]));
+			sum += v[i].gap;
 		}
 	}
-	int numm = find(1);
-	for (int i = 2; i <= idx; i++)
+
+	int start = findd(parent[1]);
+	for (int i = 2;i < color;i++)
 	{
-		find(i);
-		if (parent[i] != numm)
+		if (start != findd(parent[i]))
 		{
 			cout << -1;
 			exit(0);
@@ -211,4 +172,3 @@ int main(void)
 	cout << sum;
 	return 0;
 }
-
