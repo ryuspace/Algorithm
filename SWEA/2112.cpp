@@ -4,105 +4,108 @@
 */
 #include <iostream>
 #include <algorithm>
+#include <cstring>
 
 using namespace std;
 
-int t, d, w, k;
+int t;
 int arr[14][21];
 bool visit[14];
-//0은 A 1은 B;
-int res = 1e9;
+int mini = 1e9;
+int d, w, k;
 
-bool check()
+bool play()
 {
-	for (int i = 0; i < w; i++)
+	for (int j = 0;j < w;j++)
 	{
-		bool flag = false;
-		int a = 0, b = 0;
-		for (int j = 0; j < d; j++)
+		int maxx = 0;
+		int cnt = 1;
+		int me = arr[0][j];
+		for (int i = 1;i < d;i++)
 		{
-			if (arr[j][i] == 0)
+			if (arr[i][j] == me)
 			{
-				a++;
-				b = 0;
+				cnt++;
 			}
 			else
 			{
-				b++;
-				a = 0;
+				maxx = max(maxx, cnt);
+				cnt = 1;
 			}
-			if (a >= k || b >= k)
-			{
-				flag = true;
-				break;
-			}
+			me = arr[i][j];
 		}
-		if (!flag)
+		maxx = max(maxx, cnt);
+		if (maxx < k)
 			return false;
 	}
 	return true;
 }
-void magic(int idx,int hi)
+void color(int idx, int type)
 {
-	for (int i = 0; i < w; i++)
+	for (int i = 0;i < w;i++)
 	{
-		arr[idx][i] = hi;
+		arr[idx][i] = type;
 	}
 }
 void dfs(int idx,int cnt)
 {
-	if (idx >= d || cnt >= res)
-	{
+	if (mini <= cnt)
 		return;
-	}
-	int tmp[21] = { 0, };
-	
-	visit[idx] = true;
-	for (int r = 0; r < w; r++)
-	{
-		tmp[r] = arr[idx][r];
-	}
-	for (int j = 0; j < 2; j++)
-	{
-		magic(idx, j);
-		if (check())
-		{
-			res = min(res, cnt + 1);
-		}
-		dfs(idx + 1, cnt + 1);
-	}
-	visit[idx] = false;
-	for (int r = 0; r < w; r++)
-	{
-		arr[idx][r]= tmp[r];
-	}
 
-	dfs(idx + 1, cnt);
+	if (cnt <= d)
+	{
+		if (play())
+		{
+			mini = min(mini, cnt);
+		}
+	}
+	if (cnt == d)
+		return;
+	for (int i = idx;i < d;i++)
+	{
+		if (!visit[i])
+		{
+			int tmp[21];
+			visit[i] = true;
+			for (int j = 0;j < w;j++)
+			{
+				tmp[j] = arr[i][j];
+			}
+			for (int j = 0;j <=1;j++)
+			{
+				color(i, j);
+				dfs(i, cnt + 1);
+			}
+
+			visit[i] = false;
+			for (int j = 0;j < w;j++)
+			{
+				arr[i][j] = tmp[j];
+			}
+		}
+	}
 }
 int main()
 {
-	freopen("Text.txt", "r", stdin);
+	//freopen("Test.txt", "r", stdin);
 	ios_base::sync_with_stdio(0);
 	cin.tie(0);
 	cout.tie(0);
+
 	cin >> t;
-	for (int r = 1; r <= t; r++)
+	for (int q = 1;q <= t;q++)
 	{
-		res = 1e9;
+		mini = 1e9;
 		cin >> d >> w >> k;
-		for (int i = 0; i < d; i++)
+		for (int i = 0;i < d;i++)
 		{
-			for (int j = 0; j < w; j++)
+			for (int j = 0;j < w;j++)
 			{
 				cin >> arr[i][j];
 			}
 		}
-		if (check())
-			res = 0;
-		else
-			dfs(0, 0);
-		cout << "#" << r << " " << res << '\n';
+		dfs(0, 0);
+		cout << "#" << q << " " << mini << '\n';
 	}
-	
 	return 0;
 }
