@@ -4,64 +4,88 @@
 */
 #include <iostream>
 #include <algorithm>
-#include <cstring>;
+#include <cstring>
+
 using namespace std;
+
+int n;
+int arr[21][21];
+int t;
+int maxi;
 
 int dx[4] = { 1,1,-1,-1 };
 int dy[4] = { 1,-1,-1,1 };
-int n;
-int arr[21][21];
 bool visit[101];
-int maxx = -1;
-void dfs(int ori_x,int ori_y,int x,int y,int dir,int cnt)
+
+void dfs(int start_x, int start_y, int x, int y, int dir,int cnt)
 {
 	if (x < 0 || x >= n || y < 0 || y >= n)
 		return;
-	if (dir == 4)
-		return;
-	if (dir == 3 && x==ori_x&& y==ori_y)
+	if (start_x == x && start_y == y && dir==3)
 	{
-		maxx = max(cnt, maxx);
+		maxi = max(maxi, cnt);
 		return;
 	}
 	if (!visit[arr[x][y]])
 	{
 		visit[arr[x][y]] = true;
-		dfs(ori_x,ori_y,x+dx[dir],y+dy[dir],dir,cnt+1);
+		if (dir == 0)
+		{
+			dfs(start_x, start_y, x + dx[0], y + dy[0], 0, cnt + 1);
+			dfs(start_x, start_y, x + dx[1], y + dy[1], 1, cnt + 1);
+		}
+		else if (dir == 1)
+		{
+			dfs(start_x, start_y, x + dx[1], y + dy[1], 1, cnt + 1);
+			dfs(start_x, start_y, x + dx[2], y + dy[2], 2, cnt + 1);
+		}
+		else if (dir == 2)
+		{
+			dfs(start_x, start_y, x + dx[2], y + dy[2], 2, cnt + 1);
+			dfs(start_x, start_y, x + dx[3], y + dy[3], 3, cnt + 1);
+		}
+		else if (dir == 3)
+		{
+			dfs(start_x, start_y, x + dx[3], y + dy[3], 3, cnt + 1);
+		}
 		visit[arr[x][y]] = false;
 	}
-	if (!visit[arr[x][y]])
-	{
-		visit[arr[x][y]] = true;
-		dfs(ori_x,ori_y,x + dx[(dir+1)%4], y + dy[(dir+1)%4], dir+1, cnt + 1);
-		visit[arr[x][y]] = false;
-	}
-
 }
 int main()
 {
-	int t;
+	//freopen("Test.txt", "r", stdin);
+	//ios_base::sync_with_stdio(0);
+	//cin.tie(0);
+	//cout.tie(0);
+
 	cin >> t;
-	for (int r = 1; r <= t; r++)
+	for (int q = 1;q <= t;q++)
 	{
-		maxx = -1;
+		maxi = 0;
 		cin >> n;
-		for (int i = 0; i < n; i++)
+		for (int i = 0;i < n;i++)
 		{
-			for (int j = 0; j < n; j++)
+			for (int j = 0;j < n;j++)
 			{
 				cin >> arr[i][j];
 			}
 		}
-		for (int i = 0; i < n; i++)
+		for (int i = 0;i < n;i++)
 		{
-			for (int j = 0; j < n; j++)
+			for (int j = 0;j < n;j++)
 			{
-				memset(visit, 0, sizeof(visit));
-				dfs(i,j,i, j, 0,0);
+				dfs(i, j, i, j, 0, 0);
 			}
 		}
-		cout << '#' << r << " " << maxx << '\n';
+		if (maxi == 0)
+		{
+			cout << "#" << q << " " << -1 << '\n';
+		}
+		else
+		{
+			cout << "#" << q << " " << maxi << '\n';
+		}
+
 	}
 
 	return 0;
