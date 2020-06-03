@@ -8,100 +8,124 @@ ps : 속도 하나하나를 움직이는걸 시뮬레이션을 했더니 재채�
 */
 #include <iostream>
 #include <algorithm>
-
 using namespace std;
+
+int R, C, M;
+
+
 struct point
 {
 	int s, d, z;
 };
-int R, C, M, r, c, s, d, z;
+
 point arr[101][101];
-int dx[4] = { -1,0,1,0 };
-int dy[4] = { 0,1,0,-1 };
-//북 동 남 서
-void mov()
+int sum;
+
+int dx[5] = {0, -1,1,0,0 };
+int dy[5] = {0, 0,0,1,-1 };
+
+void moveShark()
 {
-	point cop[101][101] = { 0, };
-	for (int i = 0; i < R; i++)
+	point tmp[101][101];
+	for (int i = 1;i <=R;i++)
 	{
-		for (int j = 0; j < C; j++)
+		for (int j = 1;j <=C;j++)
 		{
-			if (arr[i][j].z != 0)
+			tmp[i][j] = { 0,0,0 };
+		}
+	}//초기화
+	
+	for (int i = 1;i <= R;i++)
+	{
+		for (int j = 1;j <= C;j++)
+		{
+			if (arr[i][j].z > 0)
 			{
-				int ss = arr[i][j].s;
 				int x = i;
 				int y = j;
-				int nx = i + (dx[arr[i][j].d])* ss;
-				int ny = j+ (dy[arr[i][j].d])* ss;
-				int idir = arr[i][j].d;
+				int dir = arr[i][j].d;
+				int sok = arr[i][j].s;
 				while (true)
 				{
+					int nx = (sok * dx[dir]) + x;
+					int ny = (sok * dy[dir]) + y;
 
-					if (nx >= 0 && nx < R && ny >= 0 && ny < C)
+					if (nx >= 1 && nx <= R && ny >= 1 && ny <= C)
+					{
+						if (tmp[nx][ny].z == 0 || tmp[nx][ny].z < arr[i][j].z)
+							tmp[nx][ny] = { arr[i][j].s,dir,arr[i][j].z };
 						break;
-					if (idir == 3 && ny < 0) {
-						ss -= y; y = 0; idir = 1; }
-					else if (idir == 1 && ny >= C) { ss -= C -1- y; y = C - 1; idir = 3; }
-					else if (idir == 2 && nx >= R) { ss -= R - 1-x; x = R - 1; idir = 0; }
-					else if (idir == 0 && nx < 0) { ss -= x; x = 0; idir = 2; }
-					nx = x +  ss*dx[idir];
-					ny = y + ss * dy[idir];
-				}
-				if (cop[nx][ny].z != 0 && arr[i][j].z > cop[nx][ny].z
-					|| cop[nx][ny].z == 0)
-				{
-					cop[nx][ny] = arr[i][j];
-					cop[nx][ny].d=idir;
+					}
+					if (dir == 1 && nx <= 0)
+					{
+						nx = 1;
+						sok -= x - 1;
+						dir = 2;
+					}
+					else if (dir == 2 && nx > R)
+					{
+						nx = R;
+						sok -= R - x;
+						dir = 1;
+					}
+					else if (dir == 3 && ny >C) {
+						ny = C;
+						sok -= C-y;
+						dir = 4;
+					}
+					else if (dir == 4 && ny<=0)
+					{
+						ny = 1;
+						sok -= y-1;
+						dir = 3;
+					}
 
+					x = nx;
+					y = ny;
 				}
-				arr[i][j].s = 0;
-				arr[i][j].d = 0;
-				arr[i][j].z = 0;
+				
 			}
 		}
 	}
-	for (int i = 0; i < R; i++)
+	for (int i = 1;i <= R;i++)
 	{
-		for (int j = 0; j < C; j++)
+		for (int j = 1;j <= C;j++)
 		{
-			arr[i][j] = cop[i][j];
+			arr[i][j] = tmp[i][j];
 		}
 	}
 
 }
-
 int main()
 {
-	//freopen("Text.txt", "r", stdin);
+	//freopen("Test.txt", "r", stdin);
 	ios_base::sync_with_stdio(0);
 	cin.tie(0);
 	cout.tie(0);
-	cin >> R >> C >> M;
-	for (int i = 0; i < M; i++)
+
+	cin >> R >> C>>M;
+	for (int i = 0;i < M;i++)
 	{
+		int r, c, s, d, z;
 		cin >> r >> c >> s >> d >> z;
-		arr[r-1][c-1].s = s;
-		if (d == 2)
-			arr[r-1][c-1].d = 3 - 1;
-		else if (d == 3)
-			arr[r-1][c-1].d = 2 - 1;
-		else
-			arr[r-1][c-1].d = d - 1;
-		arr[r-1][c-1].z = z;
+		arr[r][c] = { s,d,z };
 	}
-	int sum = 0;
-	for (int i = 0; i < C; i++)
+
+
+	int now = 1;
+	while (now != C+1)
 	{
-		for (int j = 0; j < R; j++)
+		for (int i = 1;i <= R;i++)
 		{
-			if (arr[j][i].z != 0)
+			if (arr[i][now].z > 0)
 			{
-				sum += arr[j][i].z;
-				arr[j][i] = { 0,0,0 };
+				sum += arr[i][now].z;
+				arr[i][now] = { 0,0,0 };
 				break;
 			}
 		}
-		mov();
+		moveShark();
+		now++;
 	}
 	cout << sum;
 	return 0;
