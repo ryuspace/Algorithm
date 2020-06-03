@@ -1,91 +1,165 @@
 //https://www.acmicpc.net/problem/14890
-/*풀이 : 이미 경사로인 곳은 visit 배열로 체크해주자!
-또 어디서 경사로를 놓을때 이미 경사로이면 pass~~
-열체크할때는 그냥 원래 배열의 행 열을 돌려서
-평소처럼 행,열 검사하면 된다.*/
+/*풀이 : 
+j-1열과 j열을 비교해서 같으면 우선 pass, 1이상으로 차이나면 불가능한 경우다.
+그 이외의 경우는 차이가 1이다.
+이전보다 현재가 높이가 높으면 왼쪽으로 경사로를 놔보고 그렇지 않으면 오른쪽으로 경사로를 놔본다.
+왼쪽으로는 경사로를 놔보다가 l보다 놓을 길이가 짧거나, 이미 경사로가 있으면 놓을 수 없다.
+오른쪽으로는 경사로를 놔보다가 이미 경사로가 있으면 놓을 수 없다.
+열 방향 탐색은 기존 배열을 돌려 같은 코드로 체크를 한다.
+*/
 #include <iostream>
 #include <algorithm>
-#include <cmath>
 #include <cstring>
 using namespace std;
 
-int a[101][101];
-int b[101][101];
 int n, l;
-int ans = 0;
-void sol(int row, int a[101][101])
+int arr[101][101];
+bool gyeong[101][101];
+int sum;
+bool check(int start,int x, int y, int l,int dir)
 {
-	bool visit[101][101];
-	memset(visit, false, sizeof(visit));
-	int temp = a[row][0];
-	for (int i = 0; i < n; i++)
+	int cnt = 0;
+	if (dir == 0) //왼쪽
 	{
-		if (abs(a[row][i] - temp) > 1)
-			return;
-		if (temp > a[row][i])
+		int nx = x;
+		int ny = y;
+		for (int i = 0;i < l;i++)
 		{
-			int cnt = 0;
-			int num = a[row][i];
-			for (int j = i; j <= l + i-1; j++)
+			if (arr[nx][ny] + 1 == start && !gyeong[nx][ny])
 			{
-				if (j >= n)
-					break;
-				if (visit[row][j])
-					return;
-				if (a[row][j] == num)
-				{
-					cnt++;
-					visit[row][j] = true;
-				}
+				cnt++;
 			}
-			if (cnt != l)
-				return;
-			i = l + i-1;
-			if (i >= n)
+			else
+			{
+				break;
+			}
+			ny--;
+			if (ny < 0)
 				break;
 		}
-		else if (temp<a[row][i])
+		if (cnt == l)
 		{
-			int cnt = 0;
-			int num = temp;
-			for (int j = i-1; j > i-1-l; j--)
+			int nx = x;
+			int ny = y;
+			for (int i = 0;i < l;i++)
 			{
-				if (j < 0)
-					break;;
-				if (visit[row][j])
-					return;
-				if (a[row][j] == num)
+				gyeong[nx][ny] = true;
+				ny--;
+			}
+
+			return true;
+		}
+
+	}
+	else//오른쪽
+	{
+		int nx = x;
+		int ny = y;
+		for (int i = 0;i < l;i++)
+		{
+			if (arr[nx][ny] + 1 == start && !gyeong[nx][ny])
+			{
+				cnt++;
+			}
+			else
+			{
+				break;
+			}
+			ny++;
+			if (ny >= n)
+				break;
+		}
+		if (cnt == l)
+		{
+			int nx = x;
+			int ny = y;
+			for (int i = 0;i < l;i++)
+			{
+				gyeong[nx][ny] = true;
+				ny++;
+			}
+			return true;
+		}
+	}
+	return false;
+}
+void go()
+{
+	for (int i = 0;i < n;i++)
+	{
+		bool flag = false;
+		int start = arr[i][0];
+		for (int j = 1;j < n;j++)
+		{
+			if (abs(arr[i][j] - start) > 1)
+			{
+				flag = true;
+				break;
+			}
+			if (gyeong[i][j])
+			{
+				start = arr[i][j];
+				continue;
+			}
+			if (start < arr[i][j])
+			{
+				if (!check(arr[i][j], i, j-1, l, 0))
 				{
-					cnt++;
-					visit[row][j] = true;
+					flag = true;
+					break;
 				}
 			}
-			if (cnt != l)
-				return;
+			else if (start > arr[i][j])
+			{
+				if (!check(start, i, j, l, 1))
+				{
+					flag = true;
+					break;
+				}
+				
+			}
+			start = arr[i][j];
 		}
-		temp = a[row][i];
+		if (!flag)
+		{
+			sum++;
+		}
 	}
-	ans++;
 }
-
 int main()
 {
+	//freopen("Test.txt", "r", stdin);
 	ios_base::sync_with_stdio(0);
-	cin >> n >> l;
-	for (int i = 0; i < n; i++)
+	cin.tie(0);
+	cout.tie(0);
+
+	cin >> n>>l;
+	for (int i = 0;i < n;i++)
 	{
-		for (int j = 0; j < n; j++)
+		for (int j = 0;j < n;j++)
 		{
-			cin >> a[i][j];
-			b[j][i] = a[i][j];
+			cin >> arr[i][j];
+		}
+	}
+	go();
+	memset(gyeong, 0, sizeof(gyeong));
+	int tmp[101][101];
+	for (int i = 0;i < n;i++)
+	{
+		for (int j = 0;j < n;j++)
+		{
+			tmp[i][j] = arr[i][j];
 		}
 	}
 
-	for (int i = 0; i < n; i++)
+	for (int i = 0;i < n;i++)
 	{
-		sol(i, a);
-		sol(i, b);
+		for (int j = 0;j < n;j++)
+		{
+			arr[i][j] = tmp[n - 1 - j][i];
+		}
 	}
-	cout << ans;
+	go();
+	cout << sum;
 	return 0;
 }
