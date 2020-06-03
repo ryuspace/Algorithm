@@ -1,124 +1,129 @@
 /*2382번 미생물 격리
-풀이 : 시뮬레이션..어떤 한 공간에 여러미생물이 몰릴 때
+풀이 : 시뮬레이션..어떤 한 공간에 여러 미생물이 몰릴 때
 그 몰리는 미생물 중 군집이 큰 애의 방향으로 선택되는거 주의!
 위치가 다들 다르므로 같은 위치의 약품처리에 있는 애들끼리 겹칠 일은 없다.
+그 외 까다로운 부분은 없었다.
 */
 #include <iostream>
 #include <algorithm>
-#include <vector>
+#include <cstring>
+
 using namespace std;
-typedef pair<int, int> pii;
-int t, n, m, k;
-int dx[4] = { -1,0,1,0 };//상좌하우
-int dy[4] = { 0,-1,0,1 };
-pii arr[102][102];
-pii nex[102][102];
-bool visit[102][102];
-vector<pii> v;
-vector<pii> v2;
-vector<int> ho[102][102];
 
-void check(int x, int y)
+int t;
+int n, m, k;
+
+struct point
 {
-	int real_x = x;
-	int real_y = y;
-	x += dx[arr[real_x][real_y].second];
-	y += dy[arr[real_x][real_y].second];
-	if (x==0 || y==0 || x==n-1|| y==n-1)
-	{
-		nex[x][y].first = (arr[real_x][real_y].first) / 2;
-		nex[x][y].second = (arr[real_x][real_y].second + 2) % 4;
-		if (nex[x][y].first != 0)
-			v2.push_back(make_pair(x, y));
-	}
-	else
-	{
-		if (nex[x][y].first == 0 && nex[x][y].second == 0)//아무도 없다
-		{
-			nex[x][y].first = (arr[real_x][real_y].first);
-			nex[x][y].second = (arr[real_x][real_y].second);
-			v2.push_back(make_pair(x, y));
-			ho[x][y].push_back(nex[x][y].first);
-		}
-		else
-		{
+	int su, dir;
+};
+point arr[101][101];
+int maxi[101][101];
+point tmp[101][101];
 
-			if (ho[x][y][0] < arr[real_x][real_y].first)
-			{
-				nex[x][y].second = (arr[real_x][real_y].second);
-				ho[x][y][0] = arr[real_x][real_y].first;
-
-
-			}
-			nex[x][y].first += (arr[real_x][real_y].first);
-		}
-	}
-
-}
+int dx[4] = { -1,0,1,0 };
+int dy[4] = { 0,1,0,-1 };
+//상 우 하 좌
 int main()
 {
-	freopen("t.txt", "r", stdin);
+	freopen("Test.txt", "r", stdin);
 	ios_base::sync_with_stdio(0);
+	cin.tie(0);
+	cout.tie(0);
+
 	cin >> t;
-	for (int q = 1; q <= t; q++)
+	for (int q = 1;q <= t;q++)
 	{
-		v.clear();
-		v2.clear();
-		cin >> n >> m >> k;
-		for (int i = 0; i < k; i++)
-		{
-			int ga, se, mi, dir;
-			cin >> ga >> se >> mi >> dir;
-			if (dir == 1) {
-				arr[ga][se] = make_pair(mi, 0);
-			}
-			else if (dir == 2) {
-				arr[ga][se] = make_pair(mi, 2);
-			}
-			else if (dir == 3) {
-				arr[ga][se] = make_pair(mi, 1);
-			}
-			else if (dir == 4) {
-				arr[ga][se] = make_pair(mi, 3);
-			}
-			v.push_back(make_pair(ga, se));
-		}
-		for (int i = 0; i < m; i++)//지난 시간.
-		{
-			for (int j = 0; j < v.size(); j++)
-			{
-				check(v[j].first, v[j].second);
-			}
-			for (int j = 0; j < n; j++)
-			{
-				for (int p = 0; p < n; p++)
-				{
-					ho[j][p].clear();
-				}
-			}
-			v.clear();
-			v = v2;
-			for (int u = 0; u < n; u++)
-			{
-				for (int j = 0; j < n; j++)
-				{
-					arr[u][j].first = nex[u][j].first;
-					arr[u][j].second = nex[u][j].second;
-					nex[u][j].first = 0;
-					nex[u][j].second = 0;
-				}
-			}
-			v2.clear();
 
-
-		}
 		int sum = 0;
-		for (int i = 0; i < v.size(); i++)
+		cin >> n >> m >> k;
+		for (int i = 0;i < k;i++)
 		{
-			sum += arr[v[i].first][v[i].second].first;
+			int a, b, c, d;
+			cin >> a >> b >> c >> d;
+			if (d== 1)
+			{
+				d = 0;
+			}
+			else if (d == 4)
+			{
+				d = 1;
+			}
+			arr[a][b] = { c,d };
+		}
+		for(int hi=1;hi<=m;hi++)
+		{
+			memset(maxi, 0, sizeof(maxi));
+			for (int i = 0;i < n;i++)
+			{
+				for (int j = 0;j < n;j++)
+				{
+					tmp[i][j] = { 0,0 };
+				}
+			}
+			for (int i = 0;i < n;i++)
+			{
+				for (int j = 0;j < n;j++)
+				{
+					if (arr[i][j].su > 0)
+					{
+						int nx = dx[arr[i][j].dir] + i;
+						int ny = dy[arr[i][j].dir]+ j;
+						if (nx == 0 || nx == n - 1 || ny == 0 || ny == n - 1)
+						{
+							arr[i][j].dir = (arr[i][j].dir + 2) % 4;
+							arr[i][j].su /= 2;
+						}
+						if (tmp[nx][ny].su > 0)
+						{
+							if (maxi[nx][ny] < arr[i][j].su)
+							{
+								maxi[nx][ny] = arr[i][j].su;
+								tmp[nx][ny].dir = arr[i][j].dir;
+								tmp[nx][ny].su += arr[i][j].su;
+							}
+							else
+							{
+								tmp[nx][ny].su += arr[i][j].su;
+							}
+						}
+						else
+						{
+							tmp[nx][ny].dir = arr[i][j].dir;
+							tmp[nx][ny].su += arr[i][j].su;
+							maxi[nx][ny] = arr[i][j].su;
+						}
+						arr[i][j] = { 0,0 };
+					}
+				}
+			}
+			for (int i = 0;i < n;i++)
+			{
+				for (int j = 0;j < n;j++)
+				{
+					arr[i][j] = tmp[i][j];
+				}
+			}
+		}
+		for (int i = 0;i < n;i++)
+		{
+			for (int j = 0;j < n;j++)
+			{
+				if (arr[i][j].su > 0)
+				{
+					sum += arr[i][j].su;
+				}
+			}
 		}
 		cout << "#" << q << " " << sum << '\n';
-
+		for (int i = 0;i < n;i++)
+		{
+			for (int j = 0;j < n;j++)
+			{
+				arr[i][j] = tmp[i][j] = { 0,0 };
+			}
+		}
 	}
+
 	return 0;
 }
