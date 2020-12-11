@@ -1,7 +1,7 @@
 #include <stdio.h>
 #define MAXR 150
 #define MAXC 150
-#define MAXH MAXR*MAXC
+#define MAXH MAXR*MAXC // **여유공간 더 잡아야한다
 #define MAXNAME 10
 
 struct fruit
@@ -32,7 +32,7 @@ informId tmpNode[MAXH + 10];
 int tmpIdx;
 int ID = 1;
 fruit arr[MAXR + 10][MAXC + 10];
-allFruit allFruitInform[MAXNAME + 10];//아이디로 모든 과일 정보
+allFruit allFruitInform[MAXNAME + 10];//아이디로 모든 과일 정보 **배열크기 MAXH+10;
 
 int getHash(char *name)
 {
@@ -134,7 +134,7 @@ void setFarm(int row, int col, char crop[])
 		myRow = arr[myRow][myCol].px;
 		myCol = arr[myRow][myCol].py;
 		myRoot = arr[myRow][myCol].root;
-	}
+	}//*myRow가 134번째 줄에서 바뀌니깐 135번쨰 줄부터 엉뚱한 곳이 들어간다. 변수를 새로 선언해서 미리 myRow와 myCol을 담아두자
 
 	int prevId = arr[myRow][myCol].id;
 	allFruitInform[prevId].cnt -= arr[myRow][myCol].cnt;
