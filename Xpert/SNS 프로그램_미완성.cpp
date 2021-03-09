@@ -1,3 +1,4 @@
+/// user.cpp
 #ifndef NULL
 #define NULL 0
 #endif
@@ -5,74 +6,115 @@
 #define MAXPID 100010
 #define MAXTIME 100010
 
+
 struct Node
 {
-    int cnt;
-    int arr[11];
-};
-
-struct Follow
-{
-    int cnt;
-    int follower[1001];
-};
-
-struct hash
-{
+    int uid;
     int pid;
     int time;
-}buf[MAXTIME],*htble[2][101];
-
-//1000개 그냥 링크드리스트..?
-
-
-
-Node tree[2][MAXUID][101];
-int timeToValue[MAXPID];
-int pidToTime[MAXPID];
-int pidToUid[MAXPID];
+    Node* next;
+    Node* alloc(int vuid, int vpid, int vtime, Node *vnext)
+    {
+        uid = vuid;
+        pid = vpid;
+        time = vtime;
+        next = vnext;
+        return this;
+    }
+}buf[MAXPID],*htable[MAXUID],info[MAXPID];
+Node *continuePtr[MAXUID];
 int likey[MAXPID];
-Follow followee[MAXUID];
+int tmpIdx;
 
-
-
-
-
-
+struct User
+{
+    int cnt;
+    int follower[MAXUID];
+}user[MAXUID];
 
 void init() {
+
+    tmpIdx = 0;
+
+    for (int i = 0;i < MAXUID;i++)
+    {
+        user[i].follower[user[i].cnt++] = i;
+        htable[i] = NULL;
+    }
+    for (int i = 0;i < MAXPID;i++)
+    {
+        likey[i] = 0;
+    }
 }
 
 void makePost(int uid, int pid, int timeStamp) {
 
-    timeToValue[timeStamp] = pid;
-    pidToTime[pid] = timeStamp;
-    pidToUid[pid] = uid;
+    htable[uid] = buf[tmpIdx++].alloc(uid, pid, timeStamp, htable[uid]);
+    info[pid].pid = pid;
+    info[pid].time = timeStamp;
+    info[pid].uid = uid;
 }
 
 void like(int pid) {
-
     likey[pid]++;
-
 }
 
 void follow(int sid, int tid) {
-
-    int cnt = followee[sid].cnt;
-    followee[sid].follower[cnt] = tid;
-    followee[sid].cnt++;
+    user[sid].follower[user[sid].cnt++] = tid;
 }
 
-int getFeed(int uid, int timeStamp, int result[]) {
-
-    for (int i = 0;i < followee[uid].cnt;i++)
+int findMe(int idx,int me,int timeStamp,int res[])
+{
+    Node* p = htable[me];
+    int r=idx;
+    for (;p;p = p->next)
     {
-        for (int j = 0;j < followee[uid].follower[i];j++)
-        {
+        if (p->time < timeStamp - 1000)
+            break;
 
+        r = idx;
+        for (;r > 0;r--)
+        {
+            if (likey[p->pid] > likey[res[r - 1]])
+            {
+                res[r] = res[r - 1];
+            }
+            else if (likey[p->pid] == likey[res[r - 1]])
+            {
+                if (p->time > info[res[r - 1]].time)
+                {
+                    res[r] = res[r - 1];
+                }
+                else
+                {
+                    break;
+                }
+            }
+            else
+            {
+                break;
+            }
         }
+        res[r] = p->pid;
+        if (r < 10)
+            r++;
     }
 
+    continuePtr[me] = p;
+    return r;
+}
+void findLeft(int me)
+{
 
+}
+int getFeed(int uid, int timeStamp, int result[]) {
+
+
+    int res[12] = { 0, };
+    for (int i = 0;i < user[uid].cnt;i++)
+    {
+        int you = user[uid].follower[i];
+        
+    }
     return 1;
 }
