@@ -7,13 +7,92 @@ struct Order
 {
     int shapeId;
     int tickLater;
+    int currentTick;
 };
+
+int bigyo(Order a, Order b)
+{
+    if (a.tickLater < b.tickLater)
+        return 1;
+    else if (a.tickLater == b.tickLater)
+    {
+        if (a.currentTick < b.currentTick)
+            return 1;
+        return 0;
+    }
+    return 0;
+}
+
+
+
+void swap(Order& a, Order& b)
+{
+    Order tmp = a;
+    a = b;
+    b = tmp;
+}
 
 struct PriorityQueue
 {
-    Order queue[MAXORDER];
-    
-}q;
+    Order heap[MAXORDER];
+    int bn;
+    int (*cmp)(Order, Order);
+
+    void init()
+    {
+        bn = 0;
+        cmp = bigyo;
+    }
+
+    void push(Order num)
+    {
+        heap[++bn] = num;
+        for (int c = bn; c > 1; c /= 2)
+        {
+            if (cmp(heap[c], heap[c / 2]))
+            {
+                swap(heap[c], heap[c / 2]);
+            }
+            else
+            {
+                break;
+            }
+        }
+    }
+
+    void pop()
+    {
+        swap(heap[1], heap[bn--]);
+
+        for (int c = 2; c <= bn; c *= 2)
+        {
+            if (c < bn && cmp(heap[c + 1], heap[c]))
+            {
+                c++;
+            }
+            if (cmp(heap[c], heap[c / 2]))
+            {
+                swap(heap[c], heap[c / 2]);
+            }
+            else
+            {
+                break;
+            }
+        }
+    }
+
+    Order top()
+    {
+        return heap[1];
+    }
+
+    int Empty()
+    {
+        if (bn == 0)
+            return 1;
+        return 0;
+    }
+}pq;
 
 
 
@@ -21,26 +100,27 @@ struct Mold
 {
     int moldId;
     int shapeCnt;
-    int canShape[MAXSHAPE];
+    int canShape[11];
     Mold* next;
-    Mold* alloc(int vmoldId, int vshapeCnt, int vcanShape[],Mold *vnext)
+    Mold* alloc(int vmoldId, int vshapeCnt, int vcanShape[], Mold* vnext)
     {
         moldId = vmoldId;
         shapeCnt = vshapeCnt;
         for (int i = 0; i < vshapeCnt; i++)
         {
-            canShape[vcanShape[i]] = 1;
+            canShape[i] = vcanShape[i];
         }
         next = vnext;
         return this;
     }
-}buf[MAXSHAPE],shapeTable[MAXSHAPE];
+}buf[MAXSHAPE], shapeTable[MAXSHAPE];
 //최대 10개의 모양인데 100번 호출 가능하니깐..
 int tmpIdx;
 
 int tickCurrent;
 
 int allOrder[MAXSHAPE];
+int alreadyMake[MAXSHAPE];
 extern void makeChoco(int moldID);
 
 void initUser()
@@ -55,7 +135,9 @@ void initUser()
         }
         buf[i].next = NULL;
         allOrder[i] = 0;
+        alreadyMake[i] = 0;
     }
+    pq.init();
 }
 
 void addChocoMold(int moldID, int shapeN, int shapeIDList[])
@@ -68,7 +150,7 @@ void addChocoMold(int moldID, int shapeN, int shapeIDList[])
 
 void orderChoco(int shapeID, int tickLater)
 {
-    q.push({ shapeID,tickCurrent+tickLater });
+    pq.push({ shapeID,tickCurrent + tickLater,tickCurrent });
     allOrder[shapeID]++;
 }
 
@@ -83,43 +165,37 @@ void newTick()
 {
     tickCurrent++;
 
-    int needChoco[20001];
-    int cnt = 0;
+    if (pq.Empty())
+        return;
+    if (pq.top().tickLater > tickCurrent)
+        return;
 
-    while (!q.Empty() && q.front().tickLater == tickCurrent)
+
+
+    while (!pq.Empty() && pq.top().tickLater == tickCurrent)
     {
-        q.pop();
-        needChoco[cnt++] = q.front().shapeId;
-    }
-    
-
-
-    for (int i = 0; i < cnt; i++)
-    {
-
-        if (needChoco[i] == -1)
-            continue;
-        Mold* p = shapeTable[needChoco[i]].next;
-
-        Mold* here=NULL;
+        
+        Mold* p = shapeTable[pq.top().shapeId].next;
+        
+        if (p == NULL)
+            return;
+        pq.pop();
+        Mold* here = NULL;
 
         int maxOrder = -1;
         int minMoldId = -1;
 
         for (; p; p = p->next)
         {
+
             int order = 0;
-            for (int r = i; r < cnt; r++)
+
+            for (int i = 0; i < p->shapeCnt; i++)
             {
-                if (needChoco[r] == -1)
-                    continue;
-
-                if (p->canShape[needChoco[r]] == 1)
-                {
+                if (allOrder[p->canShape[i]] >= 1)
                     order++;
-                }
-
             }
+
             if (order > maxOrder)
             {
                 maxOrder = order;
@@ -138,17 +214,20 @@ void newTick()
         }
 
         if (maxOrder == -1)
-            continue;
-        for (int r = i; r < cnt; r++)
+            return;
+
+        for (int i = 0; i < here->shapeCnt; i++)
         {
-            if (needChoco[r] == -1)
-                continue;
-            if (here->canShape[needChoco[r]] == 1)
+            if (allOrder[here->canShape[i]] >= 1)
             {
-                allOrder[needChoco[r]]--;
-                needChoco[r] = -1;
+                allOrder[here->canShape[i]]--;
+                alreadyMake[here->canShape[i]]++;
             }
+
         }
+
         makeChoco(minMoldId);
-    }
+        
+    }    
 }
+//전체 힙 인덱스 힙으로 재구현 해보자
